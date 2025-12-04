@@ -31,6 +31,7 @@ El **Gestor de Tareas Colaborativo** es una aplicación web fullstack diseñada 
 [![CI Tests (Client)](https://github.com/SyTW2526/Proyecto-E13/actions/workflows/ci-client.yml/badge.svg)](https://github.com/SyTW2526/Proyecto-E13/actions/workflows/ci-client.yml)
 [![CI Tests (Server)](https://github.com/SyTW2526/Proyecto-E13/actions/workflows/ci-server.yml/badge.svg)](https://github.com/SyTW2526/Proyecto-E13/actions/workflows/ci-server.yml)
 [![Coverage Status](https://coveralls.io/repos/github/SyTW2526/Proyecto-E13/badge.svg?branch=develop)](https://coveralls.io/github/SyTW2526/Proyecto-E13?branch=develop)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=joelsaav_E13-P4-Sonar&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=joelsaav_E13-P4-Sonar)
 
 ---
 
