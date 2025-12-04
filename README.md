@@ -1,6 +1,6 @@
 # TaskGrid
 
-El **Gestor de Tareas Colaborativo** es una aplicación web fullstack diseñada para facilitar la organización personal y el trabajo en equipo. Inspirada en la simplicidad de _Google Tasks_ y la versatilidad visual de _Trello_, esta plataforma permite a los usuarios crear, organizar y compartir tareas de manera intuitiva y eficiente.
+El **Gestor de Tareas Colaborativo** es una aplicación web fullstack diseñada para facilitar la organización personal y el trabajo en equipo. Inspirada en la simplicidad de _Google Tasks_ y la versatilidad visual de _Trello_, esta plataforma permite a los usuarios crear, organizar y compartir tareas de manera intuitiva y eficiente..
 
 ## Características Principales
 
