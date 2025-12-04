@@ -1,0 +1,146 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id              String           @id @default(uuid())
+  email           String           @unique
+  name            String
+  password        String?
+  googleSub       String?          @unique
+  image           String?
+  emailVerifiedAt DateTime?
+  emailNotifications Boolean        @default(true)
+  pushNotifications  Boolean        @default(false)
+
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  listsOwned      List[]           @relation("ListOwner")
+  listShares      ListShare[]
+  taskShares      TaskShare[]
+  notifications   Notification[]
+
+  @@map("users")
+}
+
+model List {
+  id                  String        @id @default(uuid())
+  name                String
+  description         String?
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+
+  ownerId             String
+  owner               User          @relation("ListOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+
+  tasks               Task[]
+
+  shares              ListShare[]
+  
+  @@index([ownerId])  
+  @@map("lists")
+}
+
+model Task {
+  id                    String      @id @default(uuid())
+  name                  String
+  description           String?
+  status                TaskStatus  @default(PENDING)
+  priority              Priority    @default(MEDIUM)
+  dueDate               DateTime?
+  completedAt           DateTime?
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+  favorite              Boolean     @default(false)
+  
+  listId                String
+  list                  List        @relation(fields: [listId], references: [id], onDelete: Cascade)
+  
+  shares                TaskShare[]
+  
+  @@index([listId])
+  @@index([status]) 
+  @@map("tasks")
+}
+
+model ListShare {
+  id                          String          @id @default(uuid())
+  permission                  SharePermission @default(VIEW)
+  sharedAt                    DateTime        @default(now())
+  
+  listId                      String
+  list                        List            @relation(fields: [listId], references: [id], onDelete: Cascade)
+  
+  userId                      String
+  user                        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@unique([listId, userId])
+  @@map("list_shares")
+}
+
+model TaskShare {
+  id                          String          @id @default(uuid())
+  permission                  SharePermission @default(VIEW)
+  sharedAt                    DateTime        @default(now())
+  
+  taskId                      String
+  task                        Task            @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  
+  userId                      String
+  user                        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@unique([taskId, userId])
+  @@map("task_shares")
+}
+
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum SharePermission {
+  VIEW
+  EDIT
+  ADMIN
+}
+
+model Notification {
+  id          String            @id @default(uuid())
+  type        NotificationType
+  title       String
+  description String
+  actorName   String
+  read        Boolean           @default(false)
+  createdAt   DateTime          @default(now())
+  
+  userId      String
+  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([read])
+  @@map("notifications")
+}
+
+enum NotificationType {
+  GENERAL
+  MENTION
+  INBOX
+  FILE
+}

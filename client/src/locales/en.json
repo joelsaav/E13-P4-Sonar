@@ -1,0 +1,382 @@
+{
+  "app": {
+    "name": "TaskGrid"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "tasks": "Tasks",
+    "shared": "Shared",
+    "settings": "Settings",
+    "menu": "Menu"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+    "profile": "Profile",
+    "myAccount": "My Account",
+    "welcomeTo": "Welcome to TaskGrid",
+    "name": "Name",
+    "email": "Email",
+    "password": "Password",
+    "enter": "Enter",
+    "registerMe": "Register",
+    "createAccount": "Create an account",
+    "haveAccount": "I already have an account",
+    "loading": "Loading...",
+    "termsAndPrivacy": "By continuing you accept the Terms and Privacy Policy",
+    "loginSuccess": "Login successful. Redirecting...",
+    "registerSuccess": "Registration successful. Redirecting to dashboard...",
+    "googleLoginSuccess": "Google login successful",
+    "googleLoginError": "Error logging in with Google",
+    "googleAuthError": "Google authorization error. Verify that your origin is authorized in Google Cloud Console.",
+    "googleClientIdError": "Google Client ID not configured. Check your .env file",
+    "googleInitError": "Error initializing Google Sign-In. Check the configuration.",
+    "authError": "Authentication error"
+  },
+  "landing": {
+    "welcome": "Welcome to",
+    "subtitle": "Organize your tasks efficiently and boost your productivity",
+    "features": {
+      "taskManagement": {
+        "title": "Smart task management",
+        "description": "Create, organize and prioritize tasks with ease",
+        "details": "Lists, subtasks, due dates and priorities in a clear view. Complete tasks faster with quick actions and reusable templates."
+      },
+      "notifications": {
+        "title": "Smart notifications",
+        "description": "Configurable reminders and timely alerts",
+        "details": "Receive deadline alerts, recurring reminders and push or email notifications. Configure frequency and silence during focus time."
+      },
+      "projects": {
+        "title": "Projects and categories",
+        "description": "Organize your work by projects and teams",
+        "details": "Group tasks by project, use custom folders and tags. Share views and permissions to collaborate without losing control."
+      },
+      "customization": {
+        "title": "Customization and accessibility",
+        "description": "Themes, modes and views adapted to your workflow",
+        "details": "Support for light/dark mode, density adjustments and color schemes. Customize shortcuts and layout to adapt the app to your way of working."
+      },
+      "collaboration": {
+        "title": "Team collaboration",
+        "description": "Assignment, comments and activity tracking",
+        "details": "Work as a team with assignments, mentions and a centralized activity feed."
+      }
+    }
+  },
+  "contacts": {
+    "title": "Our Team",
+    "subtitle": "Direct contact with the TaskGrid team.",
+    "role": "Computer Engineering Student",
+    "ullProfile": "ULL Profile",
+    "avatarAlt": "Avatar of {{name}}",
+    "profileAria": "ULL Profile of {{name}}",
+    "emailAria": "Send email to {{name}}",
+    "openProfileAria": "Open ULL profile of {{name}}"
+  },
+  "footer": {
+    "contact": "Contact",
+    "rights": "Team 13 · TaskGrid",
+    "ariaLabel": "Footer"
+  },
+  "theme": {
+    "toggle": "Switch to",
+    "dark": "dark",
+    "light": "light"
+  },
+  "language": {
+    "label": "Language",
+    "name": "English",
+    "flag": "🇬🇧"
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Account preferences, notifications and privacy.",
+    "profile": {
+      "title": "Profile",
+      "description": "Update your name and password.",
+      "name": "Name",
+      "namePlaceholder": "Enter your name",
+      "email": "Email",
+      "currentPassword": "Current password",
+      "newPassword": "New password",
+      "saveChanges": "Save changes",
+      "saving": "Saving...",
+      "googleUserPasswordInfo": "Users who sign in with Google cannot change their password from the application."
+    },
+    "preferences": {
+      "title": "Preferences",
+      "description": "Theme, language and user experience.",
+      "darkTheme": "Dark theme",
+      "darkThemeDescription": "Enable dark mode for a more comfortable visual experience in low-light environments.",
+      "language": "Application language",
+      "languageDescription": "Select the language you want to use the application in.",
+      "sidebarWidth": "Layout density",
+      "sidebarWidthDescription": "Adjust the interface density and element sizes.",
+      "cardSize": "Card size",
+      "cardSizeDescription": "Adjust the size of task cards.",
+      "compact": "Compact",
+      "normal": "Normal",
+      "wide": "Wide",
+      "columns": "Columns",
+      "selectSize": "Select a size"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "description": "Configure how to receive alerts.",
+      "email": "Email",
+      "emailDescription": "Receive emails with information about your tasks.",
+      "push": "Push notifications",
+      "pushDescription": "Receive real-time pop-up notifications when someone shares a task with you or a task is about to expire."
+    },
+    "privacy": {
+      "title": "Privacy",
+      "description": "Delete your account irreversibly.",
+      "deleteAccount": "Delete account"
+    }
+  },
+  "tasks": {
+    "title": "My Tasks",
+    "emptyState": "No tasks available",
+    "noTasks": "No tasks",
+    "taskCount": {
+      "singular": "task",
+      "plural": "tasks",
+      "suffix": "total"
+    },
+    "create": {
+      "title": "Create New Task",
+      "description": "Fill in the fields to create a new task",
+      "submit": "Create Task",
+      "cancel": "Cancel"
+    },
+    "edit": {
+      "title": "Edit Task",
+      "description": "Modify the fields to edit the task",
+      "submit": "Save Changes"
+    },
+    "delete": {
+      "title": "Are you sure?",
+      "description": "This action cannot be undone. The task \"{{name}}\" will be permanently deleted.",
+      "confirm": "Delete",
+      "cancel": "Cancel"
+    },
+    "card": {
+      "createdLabel": "Created:",
+      "dueLabel": "Due:",
+      "noDate": "No date"
+    },
+    "filters": {
+      "statusPlaceholder": "Status",
+      "statusAll": "All Statuses",
+      "priorityPlaceholder": "Priority",
+      "priorityAll": "All Priorities",
+      "sortPlaceholder": "Sort by",
+      "sortFields": {
+        "dueDate": "Due Date",
+        "createdAt": "Creation Date",
+        "name": "Name"
+      },
+      "sortOrder": {
+        "asc": "Ascending",
+        "desc": "Descending"
+      }
+    },
+    "priority": {
+      "LOW": "Low",
+      "MEDIUM": "Medium",
+      "HIGH": "High",
+      "URGENT": "Urgent"
+    },
+    "status": {
+      "PENDING": "Pending",
+      "IN_PROGRESS": "In Progress",
+      "COMPLETED": "Completed"
+    },
+    "favorite": {
+      "FAVORITE": "Favorite",
+      "NOT_FAVORITE": "Not Favorite"
+    },
+    "fields": {
+      "name": {
+        "label": "Name",
+        "placeholder": "Task name"
+      },
+      "description": {
+        "label": "Description",
+        "placeholder": "Task description (optional)"
+      },
+      "list": {
+        "label": "List",
+        "placeholder": "Select a list",
+        "searchPlaceholder": "Search list...",
+        "emptyMessage": "No list found.",
+        "createNew": "Create new list"
+      },
+      "priority": {
+        "label": "Priority"
+      },
+      "status": {
+        "label": "Status"
+      },
+      "favorite": {
+        "label": "Favorite"
+      },
+      "dueDate": {
+        "label": "Due date"
+      }
+    }
+  },
+  "lists": {
+    "title": "Lists",
+    "emptyState": "No lists",
+    "sidebar": {
+      "title": "Lists"
+    },
+    "create": {
+      "title": "New List",
+      "description": "Create a new list to organize your tasks",
+      "submit": "Create List",
+      "cancel": "Cancel"
+    },
+    "edit": {
+      "title": "Edit List",
+      "description": "Modify the list details.",
+      "submit": "Save changes",
+      "cancel": "Cancel"
+    },
+    "delete": {
+      "title": "Are you sure?",
+      "description": "This action will permanently delete the list and all its tasks.",
+      "confirm": "Delete",
+      "cancel": "Cancel"
+    },
+    "fields": {
+      "name": {
+        "label": "Name",
+        "placeholder": "List name"
+      },
+      "description": {
+        "label": "Description",
+        "placeholder": "Description (optional)"
+      }
+    }
+  },
+  "share": {
+    "task": {
+      "title": "Share Task",
+      "description": "Invite other users to collaborate on this task via email."
+    },
+    "list": {
+      "title": "Share List",
+      "description": "Invite other users to collaborate on this list via email."
+    },
+    "inviteCollaborator": "Invite collaborator",
+    "emailPlaceholder": "example@email.com",
+    "invite": "Invite",
+    "peopleWithAccess": "People with access",
+    "noSharesTask": "This task hasn't been shared with anyone yet.",
+    "noSharesList": "This list hasn't been shared with anyone yet.",
+    "sharedBy": "Shared by: {{name}} ({{email}})",
+    "errorShareTask": "Error sharing the task. Check the email.",
+    "errorShareList": "Error sharing the list. Check the email.",
+    "removeCollaborator": {
+      "title": "Are you sure?",
+      "descriptionTask": "This action will remove the collaborator from the task.",
+      "descriptionList": "This action will remove the collaborator from the list.",
+      "confirm": "Confirm",
+      "cancel": "Cancel"
+    },
+    "permissions": {
+      "VIEW": "View",
+      "EDIT": "Edit",
+      "ADMIN": "Admin"
+    },
+    "errors": {
+      "noSharePermission": "You don't have permission to share this task.",
+      "noEditPermission": "You don't have permission to edit this task.",
+      "noDeletePermission": "You don't have permission to delete this task.",
+      "actionNotAllowed": "Action not allowed",
+      "understood": "Understood"
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "openNotifications": "Open notifications",
+    "unread": "{{count}} unread",
+    "allCaughtUp": "All caught up for now",
+    "markAllRead": "Mark all as read",
+    "loading": "Loading notifications...",
+    "noNotifications": "No notifications in this tab.",
+    "activityCenter": "TaskGrid activity center",
+    "viewAll": "View all",
+    "timeAgo": {
+      "now": "Just now",
+      "minutes": "{{count}} min ago",
+      "hours": "{{count}} hours ago",
+      "days": "{{count}} days ago"
+    },
+    "tabs": {
+      "GENERAL": "General",
+      "MENTION": "Mentions",
+      "INBOX": "Inbox",
+      "FILE": "Files"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome, ",
+    "description": "Summary of your tasks and statistics",
+    "noTasks": "No tasks to display.",
+    "weekNumber": "Week {{number}}",
+    "days": {
+      "mon": "Mon",
+      "tue": "Tue",
+      "wed": "Wed",
+      "thu": "Thu",
+      "fri": "Fri",
+      "sat": "Sat",
+      "sun": "Sun"
+    },
+    "statusLabels": {
+      "pending": "Pending",
+      "inProgress": "In Progress",
+      "completed": "Completed"
+    },
+    "cards": {
+      "upcomingTasks": "Upcoming Tasks",
+      "upcomingTasksDesc": "Due this week",
+      "completedTasks": "Completed Tasks",
+      "completedTasksDesc": "This week",
+      "tasksByList": "Tasks By List",
+      "tasksByListDesc": "Distribution by list",
+      "currentWeek": "Current Week",
+      "currentWeekDesc": "Tasks from Monday to Sunday",
+      "tasksByPriority": "Tasks By Priority",
+      "tasksByPriorityDesc": "Distribution by priority",
+      "tasksByStatus": "Tasks By Status",
+      "tasksByStatusDesc": "Distribution by status"
+    }
+  },
+  "shared": {
+    "title": "Shared Tasks",
+    "emptyState": "No shared tasks",
+    "listsTitle": "Shared Lists",
+    "listsEmptyState": "No shared lists"
+  },
+  "common": {
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "close": "Close",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "required": "Required",
+    "share": "Share"
+  }
+}
