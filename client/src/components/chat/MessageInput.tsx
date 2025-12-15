@@ -72,6 +72,15 @@ export function MessageInput({
     }
   };
 
+  const removeFile = (fileToRemove: File) => {
+    if (!setFiles) return;
+    setFiles((currentFiles) => {
+      if (!currentFiles) return null;
+      const filtered = currentFiles.filter((f) => f !== fileToRemove);
+      return filtered.length === 0 ? null : filtered;
+    });
+  };
+
   const onDragOver = (event: React.DragEvent) => {
     if (!allowAttachments) return;
     event.preventDefault();
@@ -155,6 +164,7 @@ export function MessageInput({
 
   return (
     <div
+      role="presentation"
       className="relative flex w-full"
       onDragOver={onDragOver}
       onDragLeave={onDragLeave}
@@ -187,27 +197,13 @@ export function MessageInput({
             <div className="absolute inset-x-3 bottom-0 z-20 overflow-x-scroll py-3">
               <div className="flex space-x-3">
                 <AnimatePresence mode="popLayout">
-                  {files?.map((file) => {
-                    return (
-                      <FilePreview
-                        key={file.name + String(file.lastModified)}
-                        file={file}
-                        onRemove={() => {
-                          if (setFiles) {
-                            setFiles((files) => {
-                              if (!files) return null;
-
-                              const filtered = Array.from(files).filter(
-                                (f) => f !== file,
-                              );
-                              if (filtered.length === 0) return null;
-                              return filtered;
-                            });
-                          }
-                        }}
-                      />
-                    );
-                  })}
+                  {files?.map((file) => (
+                    <FilePreview
+                      key={file.name + String(file.lastModified)}
+                      file={file}
+                      onRemove={() => removeFile(file)}
+                    />
+                  ))}
                 </AnimatePresence>
               </div>
             </div>

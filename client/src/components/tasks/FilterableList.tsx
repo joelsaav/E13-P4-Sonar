@@ -185,7 +185,7 @@ export function FilterableList({
       </div>
       <div className="mt-4 flex flex-col gap-4 sm:gap-2 mx-auto">
         {isLoading ? (
-          [...Array(3)].map((_, i) => (
+          [...new Array(3)].map((_, i) => (
             <div
               key={i}
               className="flex items-center gap-2 p-3 rounded-md border animate-pulse bg-muted"
@@ -218,9 +218,17 @@ export function FilterableList({
             return (
               <div
                 key={item.id}
+                role="button"
+                tabIndex={0}
                 onClick={() =>
                   onItemClick(selectedId === item.id ? null : item.id)
                 }
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    onItemClick(selectedId === item.id ? null : item.id);
+                  }
+                }}
                 className={`group flex items-center justify-between gap-2 p-3 rounded-xl cursor-pointer transition-all duration-200 border active:scale-[0.99] ${
                   selectedId === item.id
                     ? "bg-primary text-secondary font-medium shadow-sm"
@@ -263,7 +271,11 @@ export function FilterableList({
                   </Badge>
 
                   {showMenu && (
-                    <div onClick={(e) => e.stopPropagation()}>
+                    <div
+                      role="presentation"
+                      onClick={(e) => e.stopPropagation()}
+                      onKeyDown={(e) => e.stopPropagation()}
+                    >
                       <ItemActionsMenu
                         onEdit={
                           canEditList

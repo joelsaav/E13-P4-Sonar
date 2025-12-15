@@ -163,7 +163,7 @@ export function TasksPageLayout({
 
         {isLoadingTasks ? (
           <div className={`grid ${layoutConfig.grid} gap-6`}>
-            {[...Array(layoutConfig.skeletonCount)].map((_, i) => (
+            {[...new Array(layoutConfig.skeletonCount)].map((_, i) => (
               <div
                 key={i}
                 className="rounded-md border p-4 h-[160px] animate-pulse bg-muted/20"

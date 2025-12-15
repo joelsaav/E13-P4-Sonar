@@ -106,24 +106,26 @@ export function LoginForm({ forceMode, linkTo }: LoginFormProps) {
     try {
       apiG.initialize({
         client_id: googleClientId,
-        callback: async (resp) => {
-          const idToken = resp?.credential;
-          if (!idToken) {
-            setLocalError(t("auth.googleAuthError"));
-            return;
-          }
+        callback: (resp) => {
+          void (async () => {
+            const idToken = resp?.credential;
+            if (!idToken) {
+              setLocalError(t("auth.googleAuthError"));
+              return;
+            }
 
-          const tokenValidation = googleAuthSchema.safeParse({ idToken });
-          if (!tokenValidation.success) {
-            setLocalError(firstZodIssueMessage(tokenValidation.error));
-            return;
-          }
-          const result = await loginWithGoogle(tokenValidation.data.idToken);
-          if (result.success) {
-            setOk(t("auth.googleLoginSuccess"));
-          } else {
-            setLocalError(result.error || t("auth.googleLoginError"));
-          }
+            const tokenValidation = googleAuthSchema.safeParse({ idToken });
+            if (!tokenValidation.success) {
+              setLocalError(firstZodIssueMessage(tokenValidation.error));
+              return;
+            }
+            const result = await loginWithGoogle(tokenValidation.data.idToken);
+            if (result.success) {
+              setOk(t("auth.googleLoginSuccess"));
+            } else {
+              setLocalError(result.error || t("auth.googleLoginError"));
+            }
+          })();
         },
         ux_mode: "popup",
         use_fedcm_for_prompt: false,

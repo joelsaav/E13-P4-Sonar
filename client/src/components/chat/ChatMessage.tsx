@@ -120,7 +120,7 @@ type MessagePart =
 
 export interface Message {
   id: string;
-  role: "user" | "assistant" | (string & {});
+  role: "user" | "assistant";
   content: string;
   createdAt?: Date;
   experimental_attachments?: Attachment[];
@@ -133,6 +133,105 @@ export interface ChatMessageProps extends Message {
   animation?: Animation;
   actions?: React.ReactNode;
 }
+
+const TimeStamp = ({
+  createdAt,
+  animation,
+  formattedTime,
+}: {
+  createdAt: Date;
+  animation: Animation;
+  formattedTime: string;
+}) => (
+  <time
+    dateTime={createdAt.toISOString()}
+    className={cn(
+      "mt-1 block px-1 text-xs opacity-50",
+      animation !== "none" && "duration-500 animate-in fade-in-0",
+    )}
+  >
+    {formattedTime}
+  </time>
+);
+
+const MessageBubble = ({
+  isUser,
+  animation,
+  children,
+  actions,
+}: {
+  isUser: boolean;
+  animation: Animation;
+  children: React.ReactNode;
+  actions?: React.ReactNode;
+}) => (
+  <div className={cn(chatBubbleVariants({ isUser, animation }))}>
+    {children}
+    {actions && (
+      <div className="absolute -bottom-4 right-2 flex space-x-1 rounded-lg border bg-background p-1 text-foreground opacity-0 transition-opacity group-hover/message:opacity-100">
+        {actions}
+      </div>
+    )}
+  </div>
+);
+
+const renderPart = (
+  part: MessagePart,
+  index: number,
+  props: {
+    isUser: boolean;
+    animation: Animation;
+    actions?: React.ReactNode;
+    showTimeStamp: boolean;
+    createdAt?: Date;
+    formattedTime?: string;
+  },
+): React.ReactNode => {
+  const {
+    isUser,
+    animation,
+    actions,
+    showTimeStamp,
+    createdAt,
+    formattedTime,
+  } = props;
+
+  switch (part.type) {
+    case "text":
+      return (
+        <div
+          className={cn("flex flex-col", isUser ? "items-end" : "items-start")}
+          key={`text-${index}`}
+        >
+          <MessageBubble
+            isUser={isUser}
+            animation={animation}
+            actions={actions}
+          >
+            <MarkdownRenderer>{part.text}</MarkdownRenderer>
+          </MessageBubble>
+          {showTimeStamp && createdAt && formattedTime && (
+            <TimeStamp
+              createdAt={createdAt}
+              animation={animation}
+              formattedTime={formattedTime}
+            />
+          )}
+        </div>
+      );
+    case "reasoning":
+      return <ReasoningBlock key={`reasoning-${index}`} part={part} />;
+    case "tool-invocation":
+      return (
+        <ToolCall
+          key={`tool-${index}`}
+          toolInvocations={[part.toolInvocation]}
+        />
+      );
+    default:
+      return null;
+  }
+};
 
 export const ChatMessage: React.FC<ChatMessageProps> = ({
   role,
@@ -156,7 +255,6 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
   }, [experimental_attachments]);
 
   const isUser = role === "user";
-
   const formattedTime = createdAt?.toLocaleTimeString("en-US", {
     hour: "2-digit",
     minute: "2-digit",
@@ -164,109 +262,56 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
 
   if (isUser) {
     return (
-      <div
-        className={cn("flex flex-col", isUser ? "items-end" : "items-start")}
-      >
-        {files ? (
+      <div className={cn("flex flex-col", "items-end")}>
+        {files && (
           <div className="mb-1 flex flex-wrap gap-2">
-            {files.map((file, index) => {
-              return <FilePreview file={file} key={index} />;
-            })}
+            {files.map((file, index) => (
+              <FilePreview file={file} key={index} />
+            ))}
           </div>
-        ) : null}
-
-        <div className={cn(chatBubbleVariants({ isUser, animation }))}>
+        )}
+        <MessageBubble isUser={isUser} animation={animation}>
           <MarkdownRenderer>{content}</MarkdownRenderer>
-        </div>
-
-        {showTimeStamp && createdAt ? (
-          <time
-            dateTime={createdAt.toISOString()}
-            className={cn(
-              "mt-1 block px-1 text-xs opacity-50",
-              animation !== "none" && "duration-500 animate-in fade-in-0",
-            )}
-          >
-            {formattedTime}
-          </time>
-        ) : null}
+        </MessageBubble>
+        {showTimeStamp && createdAt && formattedTime && (
+          <TimeStamp
+            createdAt={createdAt}
+            animation={animation}
+            formattedTime={formattedTime}
+          />
+        )}
       </div>
     );
   }
 
   if (parts && parts.length > 0) {
-    return parts.map((part, index) => {
-      if (part.type === "text") {
-        return (
-          <div
-            className={cn(
-              "flex flex-col",
-              isUser ? "items-end" : "items-start",
-            )}
-            key={`text-${index}`}
-          >
-            <div className={cn(chatBubbleVariants({ isUser, animation }))}>
-              <MarkdownRenderer>{part.text}</MarkdownRenderer>
-              {actions ? (
-                <div className="absolute -bottom-4 right-2 flex space-x-1 rounded-lg border bg-background p-1 text-foreground opacity-0 transition-opacity group-hover/message:opacity-100">
-                  {actions}
-                </div>
-              ) : null}
-            </div>
-
-            {showTimeStamp && createdAt ? (
-              <time
-                dateTime={createdAt.toISOString()}
-                className={cn(
-                  "mt-1 block px-1 text-xs opacity-50",
-                  animation !== "none" && "duration-500 animate-in fade-in-0",
-                )}
-              >
-                {formattedTime}
-              </time>
-            ) : null}
-          </div>
-        );
-      } else if (part.type === "reasoning") {
-        return <ReasoningBlock key={`reasoning-${index}`} part={part} />;
-      } else if (part.type === "tool-invocation") {
-        return (
-          <ToolCall
-            key={`tool-${index}`}
-            toolInvocations={[part.toolInvocation]}
-          />
-        );
-      }
-      return null;
-    });
+    return parts.map((part, index) =>
+      renderPart(part, index, {
+        isUser,
+        animation,
+        actions,
+        showTimeStamp,
+        createdAt,
+        formattedTime,
+      }),
+    );
   }
 
   if (toolInvocations && toolInvocations.length > 0) {
     return <ToolCall toolInvocations={toolInvocations} />;
   }
-
   return (
-    <div className={cn("flex flex-col", isUser ? "items-end" : "items-start")}>
-      <div className={cn(chatBubbleVariants({ isUser, animation }))}>
+    <div className={cn("flex flex-col", "items-start")}>
+      <MessageBubble isUser={isUser} animation={animation} actions={actions}>
         <MarkdownRenderer>{content}</MarkdownRenderer>
-        {actions ? (
-          <div className="absolute -bottom-4 right-2 flex space-x-1 rounded-lg border bg-background p-1 text-foreground opacity-0 transition-opacity group-hover/message:opacity-100">
-            {actions}
-          </div>
-        ) : null}
-      </div>
-
-      {showTimeStamp && createdAt ? (
-        <time
-          dateTime={createdAt.toISOString()}
-          className={cn(
-            "mt-1 block px-1 text-xs opacity-50",
-            animation !== "none" && "duration-500 animate-in fade-in-0",
-          )}
-        >
-          {formattedTime}
-        </time>
-      ) : null}
+      </MessageBubble>
+      {showTimeStamp && createdAt && formattedTime && (
+        <TimeStamp
+          createdAt={createdAt}
+          animation={animation}
+          formattedTime={formattedTime}
+        />
+      )}
     </div>
   );
 };
@@ -276,7 +321,7 @@ function dataUrlToUint8Array(data: string) {
   const binaryString = atob(base64);
   const bytes = new Uint8Array(binaryString.length);
   for (let i = 0; i < binaryString.length; i++) {
-    bytes[i] = binaryString.charCodeAt(i);
+    bytes[i] = binaryString.codePointAt(i) ?? 0;
   }
   return bytes;
 }
@@ -369,7 +414,7 @@ function ToolCall({
                     {invocation.toolName}
                     {"`"}
                   </span>
-                  ...
+                  {"..."}
                 </span>
                 <Loader2 className="h-3 w-3 animate-spin" />
               </div>

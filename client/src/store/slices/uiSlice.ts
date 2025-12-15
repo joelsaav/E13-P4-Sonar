@@ -19,7 +19,7 @@ const getInitialSidebarWidth = (): SidebarWidth => {
 const getInitialTaskCardSize = (): TaskCardSize => {
   const stored = localStorage.getItem("taskCardSize");
   if (stored) {
-    const parsed = parseInt(stored, 10);
+    const parsed = Number.parseInt(stored, 10);
     if (parsed === 2 || parsed === 3 || parsed === 4) {
       return parsed as TaskCardSize;
     }

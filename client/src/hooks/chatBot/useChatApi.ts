@@ -35,6 +35,26 @@ export function useChatApi(options: UseChatApiOptions = {}): UseChatApiReturn {
     [],
   );
 
+  const parseSSELine = (line: string): string | null => {
+    if (!line.startsWith("data: ")) return null;
+    const data = line.slice(6);
+    if (data === "[DONE]") return null;
+
+    try {
+      const parsed = JSON.parse(data);
+      return parsed.content || null;
+    } catch {
+      return null;
+    }
+  };
+
+  const updateBotMessage = (botMessage: Message, content: string) => {
+    botMessage.content += content;
+    setMessages((prev) =>
+      prev.map((m) => (m.id === botMessage.id ? { ...botMessage } : m)),
+    );
+  };
+
   const processStreamResponse = useCallback(
     async (
       response: Response,
@@ -54,25 +74,9 @@ export function useChatApi(options: UseChatApiOptions = {}): UseChatApiReturn {
         const lines = chunk.split("\n");
 
         for (const line of lines) {
-          if (line.startsWith("data: ")) {
-            const data = line.slice(6);
-            if (data === "[DONE]") break;
-
-            try {
-              const parsed = JSON.parse(data);
-              if (parsed.content) {
-                botMessage.content += parsed.content;
-                setMessages((prev) =>
-                  prev.map((m) =>
-                    m.id === botMessage.id ? { ...botMessage } : m,
-                  ),
-                );
-              }
-            } catch (e) {
-              if (import.meta.env.DEV) {
-                console.error("Error parsing chunk:", e);
-              }
-            }
+          const content = parseSSELine(line);
+          if (content) {
+            updateBotMessage(botMessage, content);
           }
         }
       }

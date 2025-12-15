@@ -29,13 +29,14 @@ const HighlightedPre = React.lazy(async () => {
     language,
     ...props
   }: HighlightedPre) {
-    if (!(language in shiki.bundledLanguages)) {
-      return <pre {...props}>{children}</pre>;
-    }
+    const isValidLanguage = language in shiki.bundledLanguages;
     const [tokens, setTokens] = React.useState<
       Array<Array<{ htmlStyle?: string | object; content: string }>>
     >([]);
+
     React.useEffect(() => {
+      if (!isValidLanguage) return;
+
       let mounted = true;
       shiki
         .codeToTokens(children, {
@@ -52,8 +53,9 @@ const HighlightedPre = React.lazy(async () => {
       return () => {
         mounted = false;
       };
-    }, [children, language]);
-    if (!tokens.length) {
+    }, [children, language, isValidLanguage]);
+
+    if (!isValidLanguage || !tokens.length) {
       return <pre {...props}>{children}</pre>;
     }
     return (
