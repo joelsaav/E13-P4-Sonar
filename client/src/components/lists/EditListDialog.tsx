@@ -17,7 +17,7 @@ export default function EditListDialog({
   open,
   onOpenChange,
   list,
-}: EditListDialogProps) {
+}: Readonly<EditListDialogProps>) {
   const { t } = useTranslation();
   const [formData, setFormData] = useState({
     name: list.name,

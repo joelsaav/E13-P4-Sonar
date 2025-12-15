@@ -56,7 +56,7 @@ export function FilterableList({
   icon,
   isLoading,
   showAddButton = true,
-}: FilterableListProps) {
+}: Readonly<FilterableListProps>) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { lists, removeList, isOwner, removeShare } = useLists();
@@ -184,20 +184,26 @@ export function FilterableList({
         )}
       </div>
       <div className="mt-4 flex flex-col gap-4 sm:gap-2 mx-auto">
-        {isLoading ? (
-          [...new Array(3)].map((_, i) => (
-            <div
-              key={i}
-              className="flex items-center gap-2 p-3 rounded-md border animate-pulse bg-muted"
-            >
-              <div className="h-5 w-5 bg-muted rounded-full" />
-              <div className="h-4 w-2/3 bg-muted rounded" />
-            </div>
-          ))
-        ) : items.length === 0 ? (
-          <p className="text-sm text-muted-foreground">{emptyMessage}</p>
-        ) : (
-          items.map((item) => {
+        {(() => {
+          if (isLoading) {
+            return [...new Array(3)].map((_, i) => (
+              <div
+                key={`skeleton-${i}`}
+                className="flex items-center gap-2 p-3 rounded-md border animate-pulse bg-muted"
+              >
+                <div className="h-5 w-5 bg-muted rounded-full" />
+                <div className="h-4 w-2/3 bg-muted rounded" />
+              </div>
+            ));
+          }
+
+          if (items.length === 0) {
+            return (
+              <p className="text-sm text-muted-foreground">{emptyMessage}</p>
+            );
+          }
+
+          return items.map((item) => {
             const isItemOwner = isOwner(item.id);
             const listData = getList(item.id);
             const myShare = listData?.shares?.find(
@@ -216,20 +222,13 @@ export function FilterableList({
               canEditList || canDeleteList || canShareList || canUnshareList;
 
             return (
-              <div
+              <button
                 key={item.id}
-                role="button"
-                tabIndex={0}
+                type="button"
                 onClick={() =>
                   onItemClick(selectedId === item.id ? null : item.id)
                 }
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    onItemClick(selectedId === item.id ? null : item.id);
-                  }
-                }}
-                className={`group flex items-center justify-between gap-2 p-3 rounded-xl cursor-pointer transition-all duration-200 border active:scale-[0.99] ${
+                className={`group flex items-center justify-between gap-2 p-3 rounded-xl cursor-pointer transition-all duration-200 border active:scale-[0.99] text-left w-full ${
                   selectedId === item.id
                     ? "bg-primary text-secondary font-medium shadow-sm"
                     : "bg-card dark:bg-card border-border/50 hover:border-primary/30 hover:bg-muted hover:shadow-sm hover:shadow-primary/5 text-muted-foreground hover:text-foreground"
@@ -272,7 +271,6 @@ export function FilterableList({
 
                   {showMenu && (
                     <div
-                      role="presentation"
                       onClick={(e) => e.stopPropagation()}
                       onKeyDown={(e) => e.stopPropagation()}
                     >
@@ -302,10 +300,10 @@ export function FilterableList({
                     </div>
                   )}
                 </div>
-              </div>
+              </button>
             );
-          })
-        )}
+          });
+        })()}
       </div>
     </div>
   );

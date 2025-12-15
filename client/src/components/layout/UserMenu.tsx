@@ -29,7 +29,7 @@ export default function DropdownMenuWithIcon({
   onLogout,
   userInitial = "A",
   userImage,
-}: Props) {
+}: Readonly<Props>) {
   const { t } = useTranslation();
   return (
     <DropdownMenu>

@@ -21,7 +21,7 @@ export function MessageList({
   showTimeStamps = true,
   isTyping = false,
   messageOptions,
-}: MessageListProps) {
+}: Readonly<MessageListProps>) {
   return (
     <div className="space-y-4 overflow-visible">
       {messages.map((message, index) => {

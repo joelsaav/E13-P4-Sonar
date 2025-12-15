@@ -8,7 +8,7 @@ export function PromptSuggestions({
   label,
   append,
   suggestions,
-}: PromptSuggestionsProps) {
+}: Readonly<PromptSuggestionsProps>) {
   return (
     <div className="space-y-6">
       <h2 className="text-center text-2xl font-bold">{label}</h2>

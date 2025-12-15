@@ -17,7 +17,7 @@ interface LanguageSelectorProps {
 
 export default function LanguageSelector({
   variant = "submenu",
-}: LanguageSelectorProps) {
+}: Readonly<LanguageSelectorProps>) {
   const { i18n, t } = useTranslation();
 
   const languageItems = Array.isArray(i18n.options.supportedLngs)

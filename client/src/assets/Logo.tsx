@@ -10,7 +10,7 @@ export default function Logo({
   width = 32,
   height = 32,
   className,
-}: LogoProps) {
+}: Readonly<LogoProps>) {
   return (
     <svg
       version="1.0"

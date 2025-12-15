@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config({ path: "../.env" });
 import express, { Request, Response } from "express";
-import { createServer } from "http";
+import { createServer } from "node:http";
 import { initSocket } from "./utils/socket.js";
 import cors from "cors";
 import router from "./routes/routes.js";

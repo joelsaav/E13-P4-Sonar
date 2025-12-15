@@ -119,7 +119,6 @@ type MessagePart =
   | StepStartPart;
 
 export interface Message {
-  id: string;
   role: "user" | "assistant";
   content: string;
   createdAt?: Date;
@@ -372,7 +371,7 @@ const ReasoningBlock = ({ part }: { part: ReasoningPart }) => {
 
 function ToolCall({
   toolInvocations,
-}: Pick<ChatMessageProps, "toolInvocations">) {
+}: Pick<Readonly<ChatMessageProps>, "toolInvocations">) {
   if (!toolInvocations?.length) return null;
 
   return (

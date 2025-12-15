@@ -123,12 +123,12 @@ function CreateListDialogUnified(props: CreateListDialogUnifiedProps) {
 
 export default CreateListDialogUnified;
 
-export function CreateListDialog(props: Omit<ControlledProps, "mode">) {
+export function CreateListDialog(props: Omit<Readonly<ControlledProps>, "mode">) {
   return <CreateListDialogUnified mode="controlled" {...props} />;
 }
 
 export function CreateListDialogStandalone(props: {
-  children?: React.ReactNode;
+  children?: Readonly<React.ReactNode>;
 }) {
   return <CreateListDialogUnified mode="standalone" trigger={props.children} />;
 }

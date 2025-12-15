@@ -1,3 +1,4 @@
+import React from "react";
 import {
   ChartContainer,
   ChartTooltip,
@@ -19,7 +20,7 @@ interface PriorityChartProps {
   config: Record<string, { label?: string; color?: string }>;
 }
 
-export function PriorityChart({ data, config }: PriorityChartProps) {
+export function PriorityChart({ data, config }: Readonly<PriorityChartProps>) {
   const { t } = useTranslation();
 
   if (data.length === 0) {
@@ -162,7 +163,14 @@ interface WeeklyTasksChartProps {
   config: Record<string, { label?: string; color?: string }>;
 }
 
-export function WeeklyTasksChart({ data, config }: WeeklyTasksChartProps) {
+export function WeeklyTasksChart({ data, config }: Readonly<WeeklyTasksChartProps>) {
+  const renderLabel = React.useCallback(
+    (props: Omit<CustomLabelProps, "data">) => (
+      <CustomLabel {...props} data={data} />
+    ),
+    [data],
+  );
+
   return (
     <ChartContainer config={config} className="h-[250px] w-full">
       <BarChart
@@ -200,7 +208,7 @@ export function WeeklyTasksChart({ data, config }: WeeklyTasksChartProps) {
           stackId="a"
           fill={config.completed?.color || "#15803d"}
           shape={<CustomBar dataKey="completed" />}
-          label={(props) => <CustomLabel {...props} data={data} />}
+          label={renderLabel}
           maxBarSize={60}
         />
       </BarChart>

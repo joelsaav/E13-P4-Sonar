@@ -18,7 +18,7 @@ export default function FeatureCard({
   iconLabel,
   children,
   chart = false,
-}: FeatureCardProps) {
+}: Readonly<FeatureCardProps>) {
   return (
     <Card
       className={`group relative border-border/50 hover:border-primary/30 transition-all duration-500 hover:shadow-sm hover:shadow-primary/5 ${className}`}
@@ -48,19 +48,27 @@ export default function FeatureCard({
         </div>
       </CardHeader>
 
-      {bigDetails && details ? (
-        <CardContent id="big-details" className="relative pt-0">
-          <span className="text-3xl sm:text-4xl leading-none font-bold text-foreground">
-            {details}
-          </span>
-        </CardContent>
-      ) : details && !chart ? (
-        <CardContent id="details" className="relative pt-0">
-          <p className="text-xs sm:text-sm text-muted-foreground/70 whitespace-pre-line leading-relaxed">
-            {details}
-          </p>
-        </CardContent>
-      ) : null}
+      {(() => {
+        if (bigDetails && details) {
+          return (
+            <CardContent id="big-details" className="relative pt-0">
+              <span className="text-3xl sm:text-4xl leading-none font-bold text-foreground">
+                {details}
+              </span>
+            </CardContent>
+          );
+        }
+        if (details && !chart) {
+          return (
+            <CardContent id="details" className="relative pt-0">
+              <p className="text-xs sm:text-sm text-muted-foreground/70 whitespace-pre-line leading-relaxed">
+                {details}
+              </p>
+            </CardContent>
+          );
+        }
+        return null;
+      })()}
 
       {children && (
         <CardContent className="relative pt-0">{children}</CardContent>

@@ -17,7 +17,7 @@ export function FormField({
   required = false,
   children,
   className = "space-y-2",
-}: FormFieldProps) {
+}: Readonly<FormFieldProps>) {
   return (
     <div className={className}>
       <Label htmlFor={htmlFor}>
@@ -72,13 +72,16 @@ export function Field({
   className,
   orientation = "vertical",
   ...props
-}: React.ComponentProps<"div"> & VariantProps<typeof fieldVariants>) {
+}: React.ComponentProps<"fieldset"> & VariantProps<typeof fieldVariants>) {
   return (
-    <div
-      role="group"
+    <fieldset
       data-slot="field"
       data-orientation={orientation}
-      className={cn(fieldVariants({ orientation }), className)}
+      className={cn(
+        "border-0 p-0 m-0",
+        fieldVariants({ orientation }),
+        className,
+      )}
       {...props}
     />
   );

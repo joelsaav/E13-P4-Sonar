@@ -143,16 +143,24 @@ export function NotificationBell() {
           </div>
 
           <div className="max-h-80 space-y-1 overflow-y-auto px-2 py-2">
-            {loading ? (
-              <div className="px-3 py-6 text-center text-xs text-muted-foreground">
-                {t("notifications.loading")}
-              </div>
-            ) : filteredNotifications.length === 0 ? (
-              <div className="px-3 py-6 text-center text-xs text-muted-foreground">
-                {t("notifications.noNotifications")}
-              </div>
-            ) : (
-              filteredNotifications.map((notification) => (
+            {(() => {
+              if (loading) {
+                return (
+                  <div className="px-3 py-6 text-center text-xs text-muted-foreground">
+                    {t("notifications.loading")}
+                  </div>
+                );
+              }
+
+              if (filteredNotifications.length === 0) {
+                return (
+                  <div className="px-3 py-6 text-center text-xs text-muted-foreground">
+                    {t("notifications.noNotifications")}
+                  </div>
+                );
+              }
+
+              return filteredNotifications.map((notification) => (
                 <button
                   key={notification.id}
                   type="button"
@@ -198,8 +206,8 @@ export function NotificationBell() {
                     </div>
                   </div>
                 </button>
-              ))
-            )}
+              ));
+            })()}
           </div>
         </Card>
       </PopoverContent>

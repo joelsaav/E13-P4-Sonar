@@ -54,15 +54,15 @@ export default function DashboardPage() {
       chartComponent: (
         <div className="flex flex-wrap gap-2 align-center py-1">
           {weekStats.tasksPerList.length > 0 ? (
-            weekStats.tasksPerList.map((item, index) => (
+            weekStats.tasksPerList.map((item) => (
               <Badge
-                key={index}
+                key={`list-${item.listName}`}
                 variant="default"
                 className="text-md"
                 leftIcon={"IconList"}
               >
                 {item.listName}
-                <Badge key={index} variant="secondary" className="text-xs">
+                <Badge variant="secondary" className="text-xs">
                   {item.count}
                 </Badge>
               </Badge>
@@ -113,7 +113,7 @@ export default function DashboardPage() {
 
           return (
             <FeatureCard
-              key={index}
+              key={card.titleKey}
               icon={card.icon}
               title={t(card.titleKey)}
               description={t(card.descriptionKey)}

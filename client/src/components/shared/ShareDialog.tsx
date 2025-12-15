@@ -49,7 +49,6 @@ export interface ShareCollaborator {
 interface ShareDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  item: ShareItem;
   type: "task" | "list";
   shares: ShareCollaborator[];
   onShare: (email: string, permission: string) => Promise<void>;
@@ -67,7 +66,7 @@ export function ShareDialog({
   onRemoveShare,
   onUpdateShare,
   isLoading,
-}: ShareDialogProps) {
+}: Readonly<ShareDialogProps>) {
   const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [permission, setPermission] = useState<string>("VIEW");

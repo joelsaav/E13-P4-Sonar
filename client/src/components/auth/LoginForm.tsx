@@ -17,8 +17,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "react-i18next";
-import type { AuthenticateMode } from "@/types/components";
-import type { LoginFormProps } from "@/types/components";
+import type { AuthenticateMode, LoginFormProps } from "@/types/components";
 import { firstZodIssueMessage } from "@/lib/utils";
 import {
   googleAuthSchema,
@@ -27,10 +26,10 @@ import {
 } from "@/schemas/validationSchemas";
 
 function getGis() {
-  return window.google?.accounts?.id;
+  return globalThis.google?.accounts?.id;
 }
 
-export function LoginForm({ forceMode, linkTo }: LoginFormProps) {
+export function LoginForm({ forceMode, linkTo }: Readonly<LoginFormProps>) {
   const { t } = useTranslation();
   const [mode, setMode] = useState<AuthenticateMode>(forceMode ?? "login");
   const [email, setEmail] = useState("");
@@ -82,14 +81,13 @@ export function LoginForm({ forceMode, linkTo }: LoginFormProps) {
       return false;
     };
     if (!checkGisLoaded()) {
-      const i = window.setInterval(() => {
+      const i = globalThis.setInterval(() => {
         if (checkGisLoaded()) {
-          window.clearInterval(i);
+          globalThis.clearInterval(i);
         }
       }, 300);
-      return () => window.clearInterval(i);
+      return () => globalThis.clearInterval(i);
     }
-    return;
   }, []);
 
   useEffect(() => {
@@ -252,11 +250,14 @@ export function LoginForm({ forceMode, linkTo }: LoginFormProps) {
                   </FieldDescription>
                 )}
                 {(() => {
-                  const buttonText = isLoading
-                    ? t("auth.loading")
-                    : mode === "login"
-                      ? t("auth.enter")
-                      : t("auth.registerMe");
+                  let buttonText: string;
+                  if (isLoading) {
+                    buttonText = t("auth.loading");
+                  } else if (mode === "login") {
+                    buttonText = t("auth.enter");
+                  } else {
+                    buttonText = t("auth.registerMe");
+                  }
                   return (
                     <Button
                       type="submit"

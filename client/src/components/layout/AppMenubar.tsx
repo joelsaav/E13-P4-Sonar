@@ -62,7 +62,7 @@ export default function AppMenubar() {
                   userInitial={
                     user?.image
                       ? undefined
-                      : user?.name && user.name.charAt(0).toUpperCase()
+                      : user?.name?.charAt(0).toUpperCase()
                   }
                   userImage={user?.image}
                   onSettings={() => navigate("/settings")}
@@ -87,7 +87,7 @@ export default function AppMenubar() {
                         <Avatar className="h-10 w-10">
                           <AvatarImage src={user?.image} alt={user?.name} />
                           <AvatarFallback>
-                            {user?.name && user.name.charAt(0).toUpperCase()}
+                            {user?.name?.charAt(0).toUpperCase()}
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1 min-w-0">

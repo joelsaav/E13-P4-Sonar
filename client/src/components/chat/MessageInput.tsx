@@ -164,6 +164,7 @@ export function MessageInput({
 
   return (
     <div
+      role="region"
       className="relative flex w-full"
       onDragOver={onDragOver}
       onDragLeave={onDragLeave}
@@ -260,7 +261,7 @@ interface FileUploadOverlayProps {
   isDragging: boolean;
 }
 
-function FileUploadOverlay({ isDragging }: FileUploadOverlayProps) {
+function FileUploadOverlay({ isDragging }: Readonly<FileUploadOverlayProps>) {
   return (
     <AnimatePresence>
       {isDragging && (

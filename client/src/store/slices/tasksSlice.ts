@@ -331,7 +331,7 @@ const tasksSlice = createSlice({
       .addCase(updateTaskSharePermission.pending, (state, action) => {
         state.error = null;
         const task = state.tasks.find((t) => t.id === action.meta.arg.taskId);
-        if (task && task.shares) {
+        if (task?.shares) {
           const share = task.shares.find(
             (s) => s.userId === action.meta.arg.userId,
           );

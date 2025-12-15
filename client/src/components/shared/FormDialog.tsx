@@ -35,13 +35,13 @@ export function FormDialog({
   open: controlledOpen,
   onOpenChange: controlledOnOpenChange,
   className,
-}: FormDialogProps) {
+}: Readonly<FormDialogProps>) {
   const { t } = useTranslation();
   const [internalOpen, setInternalOpen] = useState(false);
 
   const isControlled = controlledOpen !== undefined;
   const open = isControlled ? controlledOpen : internalOpen;
-  const setOpen = isControlled ? controlledOnOpenChange! : setInternalOpen;
+  const setOpen = isControlled ? controlledOnOpenChange : setInternalOpen;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

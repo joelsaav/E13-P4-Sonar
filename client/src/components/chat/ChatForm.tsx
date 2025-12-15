@@ -2,7 +2,6 @@ import { forwardRef, useState, type ReactElement } from "react";
 
 interface ChatFormProps {
   className?: string;
-  isPending: boolean;
   handleSubmit: (
     event?: { preventDefault?: () => void },
     options?: { experimental_attachments?: FileList },

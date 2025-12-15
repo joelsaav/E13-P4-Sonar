@@ -161,28 +161,38 @@ export function TasksPageLayout({
           </div>
         )}
 
-        {isLoadingTasks ? (
-          <div className={`grid ${layoutConfig.grid} gap-6`}>
-            {[...new Array(layoutConfig.skeletonCount)].map((_, i) => (
-              <div
-                key={i}
-                className="rounded-md border p-4 h-[160px] animate-pulse bg-muted/20"
-              >
-                <div className="h-6 w-1/3 bg-muted rounded mb-4" />
-                <div className="h-4 w-2/3 bg-muted rounded mb-2" />
-                <div className="h-4 w-1/2 bg-muted rounded" />
+        {(() => {
+          if (isLoadingTasks) {
+            return (
+              <div className={`grid ${layoutConfig.grid} gap-6`}>
+                {[...new Array(layoutConfig.skeletonCount)].map((_, i) => (
+                  <div
+                    key={`task-skeleton-${i}`}
+                    className="rounded-md border p-4 h-[160px] animate-pulse bg-muted/20"
+                  >
+                    <div className="h-6 w-1/3 bg-muted rounded mb-4" />
+                    <div className="h-4 w-2/3 bg-muted rounded mb-2" />
+                    <div className="h-4 w-1/2 bg-muted rounded" />
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        ) : tasks.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">{emptyTasksMessage}</p>
-          </div>
-        ) : (
-          <div className={`grid ${layoutConfig.grid} gap-6`}>
-            {tasks.map((task) => renderCard(task))}
-          </div>
-        )}
+            );
+          }
+
+          if (tasks.length === 0) {
+            return (
+              <div className="text-center py-12">
+                <p className="text-muted-foreground">{emptyTasksMessage}</p>
+              </div>
+            );
+          }
+
+          return (
+            <div className={`grid ${layoutConfig.grid} gap-6`}>
+              {tasks.map((task) => renderCard(task))}
+            </div>
+          );
+        })()}
       </div>
     </div>
   );

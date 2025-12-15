@@ -23,7 +23,7 @@ export function ItemActionsMenu({
   onDelete,
   onUnshare,
   align = "start",
-}: ItemActionsMenuProps) {
+}: Readonly<ItemActionsMenuProps>) {
   const { t } = useTranslation();
 
   if (!onEdit && !onShare && !onDelete && !onUnshare) {

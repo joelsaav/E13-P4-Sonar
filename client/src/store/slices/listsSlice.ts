@@ -264,7 +264,7 @@ const listsSlice = createSlice({
       .addCase(updateListSharePermission.pending, (state, action) => {
         state.error = null;
         const list = state.lists.find((l) => l.id === action.meta.arg.listId);
-        if (list && list.shares) {
+        if (list?.shares) {
           const share = list.shares.find(
             (s) => s.userId === action.meta.arg.userId,
           );

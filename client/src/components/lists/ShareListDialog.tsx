@@ -16,7 +16,7 @@ export default function ShareListDialog({
   open,
   onOpenChange,
   list,
-}: ShareListDialogProps) {
+}: Readonly<ShareListDialogProps>) {
   const { shareList, removeShare, updateShare, isLoading } = useLists();
 
   const handleShare = async (email: string, permission: string) => {
