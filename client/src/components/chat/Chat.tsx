@@ -116,8 +116,7 @@ export function Chat({
       const updatedParts = lastAssistantMessage.parts.map((part: any) => {
         if (
           part.type === "tool-invocation" &&
-          part.toolInvocation &&
-          part.toolInvocation.state === "call"
+          part.toolInvocation?.state === "call"
         ) {
           needsUpdate = true;
           return {

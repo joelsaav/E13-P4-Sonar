@@ -164,11 +164,11 @@ export function MessageInput({
 
   return (
     <div
-      role="presentation"
       className="relative flex w-full"
       onDragOver={onDragOver}
       onDragLeave={onDragLeave}
       onDrop={onDrop}
+      aria-label="File drop zone"
     >
       {enableInterrupt && (
         <InterruptPrompt

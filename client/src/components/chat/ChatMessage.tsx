@@ -265,8 +265,11 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
       <div className={cn("flex flex-col", "items-end")}>
         {files && (
           <div className="mb-1 flex flex-wrap gap-2">
-            {files.map((file, index) => (
-              <FilePreview file={file} key={index} />
+            {files.map((file) => (
+              <FilePreview
+                file={file}
+                key={`${file.name}-${file.lastModified}`}
+              />
             ))}
           </div>
         )}
@@ -382,7 +385,7 @@ function ToolCall({
         if (isCancelled) {
           return (
             <div
-              key={index}
+              key={`cancelled-${invocation.toolName}-${index}`}
               className="flex items-center gap-2 rounded-lg border bg-muted/50 px-3 py-2 text-sm text-muted-foreground"
             >
               <Ban className="h-4 w-4" />
@@ -403,7 +406,7 @@ function ToolCall({
           case "call":
             return (
               <div
-                key={index}
+                key={`call-${invocation.toolName}-${index}`}
                 className="flex items-center gap-2 rounded-lg border bg-muted/50 px-3 py-2 text-sm text-muted-foreground"
               >
                 <Terminal className="h-4 w-4" />
@@ -422,7 +425,7 @@ function ToolCall({
           case "result":
             return (
               <div
-                key={index}
+                key={`result-${invocation.toolName}-${index}`}
                 className="flex flex-col gap-1.5 rounded-lg border bg-muted/50 px-3 py-2 text-sm"
               >
                 <div className="flex items-center gap-2 text-muted-foreground">

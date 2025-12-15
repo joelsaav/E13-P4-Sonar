@@ -63,7 +63,7 @@ const HighlightedPre = React.lazy(async () => {
         <code>
           {tokens.map((line, lineIndex) => (
             <>
-              <span key={lineIndex}>
+              <span key={`line-${lineIndex}`}>
                 {line.map(
                   (
                     token: { htmlStyle?: string | object; content: string },
@@ -75,7 +75,7 @@ const HighlightedPre = React.lazy(async () => {
                         : token.htmlStyle;
                     return (
                       <span
-                        key={tokenIndex}
+                        key={`token-${lineIndex}-${tokenIndex}-${token.content.slice(0, 10)}`}
                         className="text-shiki-light bg-shiki-light-bg dark:text-shiki-dark dark:bg-shiki-dark-bg"
                         style={style}
                       >

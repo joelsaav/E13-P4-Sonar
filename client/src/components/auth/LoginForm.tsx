@@ -251,13 +251,22 @@ export function LoginForm({ forceMode, linkTo }: LoginFormProps) {
                     {ok}
                   </FieldDescription>
                 )}
-                <Button type="submit" disabled={isLoading} className="w-full">
-                  {isLoading
+                {(() => {
+                  const buttonText = isLoading
                     ? t("auth.loading")
                     : mode === "login"
                       ? t("auth.enter")
-                      : t("auth.registerMe")}
-                </Button>
+                      : t("auth.registerMe");
+                  return (
+                    <Button
+                      type="submit"
+                      disabled={isLoading}
+                      className="w-full"
+                    >
+                      {buttonText}
+                    </Button>
+                  );
+                })()}
                 {forceMode ? (
                   <Link
                     to={otherHref}
