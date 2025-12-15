@@ -5,6 +5,7 @@ import themeReducer from "./slices/themeSlice";
 import listsReducer from "./slices/listsSlice";
 import tasksReducer from "./slices/tasksSlice";
 import uiReducer from "./slices/uiSlice";
+import notificationsReducer from "./slices/notificationsSlice";
 
 export const store = configureStore({
   reducer: {
@@ -13,6 +14,7 @@ export const store = configureStore({
     lists: listsReducer,
     tasks: tasksReducer,
     ui: uiReducer,
+    notifications: notificationsReducer,
   },
 });
 

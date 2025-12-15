@@ -1,5 +1,5 @@
-import { describe, it, expect } from "vitest";
 import { cn, firstZodIssueMessage } from "@/lib/utils";
+import { describe, expect, it } from "vitest";
 import { ZodError } from "zod";
 
 describe("utils", () => {
@@ -9,7 +9,8 @@ describe("utils", () => {
     });
 
     it("should handle conditional classes", () => {
-      expect(cn("foo", false && "bar", "baz")).toBe("foo baz");
+      const condition = false;
+      expect(cn("foo", condition && "bar", "baz")).toBe("foo baz");
     });
 
     it("should merge tailwind classes", () => {
@@ -29,11 +30,7 @@ describe("utils", () => {
     it("should return first error message from ZodError", () => {
       const error = new ZodError([
         {
-          code: "too_small",
-          minimum: 1,
-          type: "string",
-          inclusive: true,
-          exact: false,
+          code: "custom",
           message: "El nombre es obligatorio",
           path: ["name"],
         },
@@ -52,11 +49,10 @@ describe("utils", () => {
     it("should return default message if issue has no message", () => {
       const error = new ZodError([
         {
-          code: "invalid_type",
-          expected: "string",
-          received: "number",
+          code: "custom",
+          message: "",
           path: ["name"],
-        } as any,
+        },
       ]);
 
       expect(firstZodIssueMessage(error)).toBe(
@@ -67,21 +63,15 @@ describe("utils", () => {
     it("should handle multiple issues and return first", () => {
       const error = new ZodError([
         {
-          code: "too_small",
-          minimum: 1,
-          type: "string",
-          inclusive: true,
-          exact: false,
+          code: "custom",
           message: "Primer error",
           path: ["name"],
         },
         {
-          code: "invalid_type",
-          expected: "string",
-          received: "number",
+          code: "custom",
           message: "Segundo error",
           path: ["email"],
-        } as any,
+        },
       ]);
 
       expect(firstZodIssueMessage(error)).toBe("Primer error");

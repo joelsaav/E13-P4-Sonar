@@ -26,3 +26,4 @@ vitest.config.ts
 tsconfig.app.json
 tsconfig.node.json
 vite.config.ts
+html

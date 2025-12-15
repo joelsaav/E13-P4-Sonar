@@ -16,18 +16,17 @@ import {
   shareList as shareListThunk,
   updateListSharePermission,
   unshareList,
-  setLoading,
-  setError,
 } from "@/store/slices/listsSlice";
 import { selectUser } from "@/store/slices/authSlice";
 import {
   selectAccessibleLists,
-  getListPermission,
   canAccessList,
   isListOwner,
 } from "@/store/slices/permissionsSelectors";
 import type { List, ListShare } from "@/types/tasks-system/list";
 import type { SharePermission } from "@/types/permissions";
+import { useCallback } from "react";
+import { store } from "@/store/store";
 
 export function useLists() {
   const dispatch = useAppDispatch();
@@ -40,8 +39,12 @@ export function useLists() {
   const selectedList = useAppSelector(selectSelectedList);
 
   const accessibleLists = useAppSelector(selectAccessibleLists);
-  const ownedLists = useAppSelector(selectOwnedLists(user?.id || ""));
-  const sharedLists = useAppSelector(selectSharedLists(user?.id || ""));
+  const ownedLists = useAppSelector((state) =>
+    selectOwnedLists(state, user?.id || ""),
+  );
+  const sharedLists = useAppSelector((state) =>
+    selectSharedLists(state, user?.id || ""),
+  );
 
   const fetchAllLists = () => dispatch(fetchLists());
   const fetchSharedListsAction = () => dispatch(fetchSharedLists());
@@ -70,18 +73,15 @@ export function useLists() {
   const removeShare = (listId: string, shareId: string) =>
     dispatch(unshareList({ listId, userId: shareId }));
 
-  const setLoadingState = (loading: boolean) => dispatch(setLoading(loading));
-  const setErrorState = (error: string | null) => dispatch(setError(error));
-
-  const state = useAppSelector((state) => state);
-
-  const getPermission = (listId: string): SharePermission | null =>
-    getListPermission(listId)(state);
-  const canAccess = (
-    listId: string,
-    permission: SharePermission = "VIEW",
-  ): boolean => canAccessList(listId, permission)(state);
-  const isOwner = (listId: string): boolean => isListOwner(listId)(state);
+  const canAccess = useCallback(
+    (listId: string, permission: SharePermission = "VIEW"): boolean =>
+      canAccessList(listId, permission)(store.getState()),
+    [],
+  );
+  const isOwner = useCallback(
+    (listId: string): boolean => isListOwner(listId)(store.getState()),
+    [],
+  );
 
   return {
     lists,
@@ -101,9 +101,6 @@ export function useLists() {
     shareList,
     updateShare,
     removeShare,
-    setLoadingState,
-    setErrorState,
-    getPermission,
     canAccess,
     isOwner,
   };

@@ -2,7 +2,7 @@ import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { useNotifications } from "@/hooks/useNotifications";
 import type { Notification } from "@/types/notification";
 import { render, screen, waitFor } from "@testing-library/react";
-import { I18nTestProvider } from "../../testUtils/i18nTestProvider";
+import { I18nTestProvider } from "../../helpers/i18nTestProvider";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -14,7 +14,7 @@ describe("NotificationBell", () => {
   const mockNotifications: Notification[] = [
     {
       id: "1",
-      type: "GENERAL",
+      type: "SYSTEM",
       title: "Nueva tarea asignada",
       description: "Te han asignado la tarea 'Revisar código'",
       read: false,
@@ -24,21 +24,21 @@ describe("NotificationBell", () => {
     },
     {
       id: "2",
-      type: "MENTION",
-      title: "Te mencionaron",
-      description: "Juan te mencionó en un comentario",
+      type: "EXPIRED",
+      title: "Va a expirar",
+      description: "La tarea 'Actualizar documentación' va a expirar pronto",
       read: false,
-      createdAt: new Date(Date.now() - 7200000).toISOString(), // 2 horas atrás
+      createdAt: new Date(Date.now() - 7200000).toISOString(),
       actorName: "María García",
       userId: "user1",
     },
     {
       id: "3",
-      type: "INBOX",
+      type: "SHARED",
       title: "Mensaje recibido",
       description: "Tienes un nuevo mensaje",
       read: true,
-      createdAt: new Date(Date.now() - 86400000).toISOString(), // 1 día atrás
+      createdAt: new Date(Date.now() - 86400000).toISOString(),
       actorName: "Pedro López",
       userId: "user1",
     },
@@ -83,9 +83,12 @@ describe("NotificationBell", () => {
       getNotificationsByType: vi.fn(() => []),
     });
 
-    const { container } = render(<NotificationBell />);
+    const { container } = render(
+      <I18nTestProvider>
+        <NotificationBell />
+      </I18nTestProvider>,
+    );
 
-    // Verificar que existe el indicador rojo
     expect(container.querySelector(".bg-red-500")).toBeInTheDocument();
   });
 
@@ -101,7 +104,11 @@ describe("NotificationBell", () => {
       getNotificationsByType: vi.fn(() => []),
     });
 
-    const { container } = render(<NotificationBell />);
+    const { container } = render(
+      <I18nTestProvider>
+        <NotificationBell />
+      </I18nTestProvider>,
+    );
 
     expect(container.querySelector(".bg-red-500")).not.toBeInTheDocument();
   });
@@ -119,7 +126,11 @@ describe("NotificationBell", () => {
     });
 
     const user = userEvent.setup();
-    render(<NotificationBell />);
+    render(
+      <I18nTestProvider>
+        <NotificationBell />
+      </I18nTestProvider>,
+    );
 
     const button = screen.getByRole("button", {
       name: "Abrir notificaciones",
@@ -144,7 +155,11 @@ describe("NotificationBell", () => {
     });
 
     const user = userEvent.setup();
-    render(<NotificationBell />);
+    render(
+      <I18nTestProvider>
+        <NotificationBell />
+      </I18nTestProvider>,
+    );
 
     await user.click(
       screen.getByRole("button", { name: "Abrir notificaciones" }),
@@ -168,7 +183,11 @@ describe("NotificationBell", () => {
     });
 
     const user = userEvent.setup();
-    render(<NotificationBell />);
+    render(
+      <I18nTestProvider>
+        <NotificationBell />
+      </I18nTestProvider>,
+    );
 
     await user.click(
       screen.getByRole("button", { name: "Abrir notificaciones" }),
@@ -192,7 +211,11 @@ describe("NotificationBell", () => {
     });
 
     const user = userEvent.setup();
-    render(<NotificationBell />);
+    render(
+      <I18nTestProvider>
+        <NotificationBell />
+      </I18nTestProvider>,
+    );
 
     await user.click(
       screen.getByRole("button", { name: "Abrir notificaciones" }),
@@ -219,7 +242,11 @@ describe("NotificationBell", () => {
     });
 
     const user = userEvent.setup();
-    render(<NotificationBell />);
+    render(
+      <I18nTestProvider>
+        <NotificationBell />
+      </I18nTestProvider>,
+    );
 
     await user.click(
       screen.getByRole("button", { name: "Abrir notificaciones" }),
@@ -246,37 +273,31 @@ describe("NotificationBell", () => {
     });
 
     const user = userEvent.setup();
-    render(<NotificationBell />);
+    render(
+      <I18nTestProvider>
+        <NotificationBell />
+      </I18nTestProvider>,
+    );
 
     await user.click(
       screen.getByRole("button", { name: "Abrir notificaciones" }),
     );
 
-    // Esperar a que aparezcan las tabs
     await waitFor(
       () => {
-        const generalTabs = screen.queryAllByText("General");
-        const mencionesTabs = screen.queryAllByText("Menciones");
-        const buzonTabs = screen.queryAllByText("Buzón");
-        const archivosTabs = screen.queryAllByText("Archivos");
+        const systemTabs = screen.queryAllByText("Sistema");
+        const sharedTabs = screen.queryAllByText("Compartidas");
+        const expiredTabs = screen.queryAllByText("Vencidas");
 
-        expect(generalTabs.length).toBeGreaterThan(0);
-        expect(mencionesTabs.length).toBeGreaterThan(0);
-        expect(buzonTabs.length).toBeGreaterThan(0);
-        expect(archivosTabs.length).toBeGreaterThan(0);
+        expect(systemTabs.length).toBeGreaterThan(0);
+        expect(sharedTabs.length).toBeGreaterThan(0);
+        expect(expiredTabs.length).toBeGreaterThan(0);
       },
       { timeout: 3000 },
     );
   });
 
   it("Filtra notificaciones al cambiar de pestaña", async () => {
-    const mockGetNotificationsByType = vi.fn((type) => {
-      if (type === "MENTION") {
-        return [mockNotifications[1]];
-      }
-      return mockNotifications;
-    });
-
     vi.mocked(useNotifications).mockReturnValue({
       notifications: mockNotifications,
       loading: false,
@@ -285,21 +306,28 @@ describe("NotificationBell", () => {
       loadNotifications: vi.fn(),
       markAsRead: vi.fn(),
       markAllAsRead: vi.fn(),
-      getNotificationsByType: mockGetNotificationsByType,
+      getNotificationsByType: vi.fn(() => mockNotifications),
     });
 
     const user = userEvent.setup();
-    render(<NotificationBell />);
+    render(
+      <I18nTestProvider>
+        <NotificationBell />
+      </I18nTestProvider>,
+    );
 
     await user.click(
       screen.getByRole("button", { name: "Abrir notificaciones" }),
     );
 
-    const mencionesTab = await screen.findAllByText("Menciones");
-    await user.click(mencionesTab[0]);
+    const expiredTab = await screen.findAllByText("Vencidas");
+    await user.click(expiredTab[0]);
 
     await waitFor(() => {
-      expect(mockGetNotificationsByType).toHaveBeenCalledWith("MENTION");
+      expect(screen.getByText("Va a expirar")).toBeInTheDocument();
+      expect(
+        screen.queryByText("Nueva tarea asignada"),
+      ).not.toBeInTheDocument();
     });
   });
 
@@ -316,7 +344,11 @@ describe("NotificationBell", () => {
     });
 
     const user = userEvent.setup();
-    render(<NotificationBell />);
+    render(
+      <I18nTestProvider>
+        <NotificationBell />
+      </I18nTestProvider>,
+    );
 
     await user.click(
       screen.getByRole("button", { name: "Abrir notificaciones" }),
@@ -342,7 +374,11 @@ describe("NotificationBell", () => {
     });
 
     const user = userEvent.setup();
-    render(<NotificationBell />);
+    render(
+      <I18nTestProvider>
+        <NotificationBell />
+      </I18nTestProvider>,
+    );
 
     await user.click(
       screen.getByRole("button", { name: "Abrir notificaciones" }),
@@ -369,7 +405,11 @@ describe("NotificationBell", () => {
     });
 
     const user = userEvent.setup();
-    render(<NotificationBell />);
+    render(
+      <I18nTestProvider>
+        <NotificationBell />
+      </I18nTestProvider>,
+    );
 
     await user.click(
       screen.getByRole("button", { name: "Abrir notificaciones" }),
@@ -394,7 +434,11 @@ describe("NotificationBell", () => {
     });
 
     const user = userEvent.setup();
-    render(<NotificationBell />);
+    render(
+      <I18nTestProvider>
+        <NotificationBell />
+      </I18nTestProvider>,
+    );
 
     await user.click(
       screen.getByRole("button", { name: "Abrir notificaciones" }),
@@ -423,7 +467,11 @@ describe("NotificationBell", () => {
     });
 
     const user = userEvent.setup();
-    render(<NotificationBell />);
+    render(
+      <I18nTestProvider>
+        <NotificationBell />
+      </I18nTestProvider>,
+    );
 
     await user.click(
       screen.getByRole("button", { name: "Abrir notificaciones" }),
@@ -462,7 +510,11 @@ describe("NotificationBell", () => {
     });
 
     const user = userEvent.setup();
-    render(<NotificationBell />);
+    render(
+      <I18nTestProvider>
+        <NotificationBell />
+      </I18nTestProvider>,
+    );
 
     await user.click(
       screen.getByRole("button", { name: "Abrir notificaciones" }),
@@ -496,7 +548,11 @@ describe("NotificationBell", () => {
     });
 
     const user = userEvent.setup();
-    render(<NotificationBell />);
+    render(
+      <I18nTestProvider>
+        <NotificationBell />
+      </I18nTestProvider>,
+    );
 
     await user.click(
       screen.getByRole("button", { name: "Abrir notificaciones" }),
@@ -520,14 +576,18 @@ describe("NotificationBell", () => {
     });
 
     const user = userEvent.setup();
-    render(<NotificationBell />);
+    render(
+      <I18nTestProvider>
+        <NotificationBell />
+      </I18nTestProvider>,
+    );
 
     await user.click(
       screen.getByRole("button", { name: "Abrir notificaciones" }),
     );
 
     await waitFor(() => {
-      expect(screen.getAllByText("General").length).toBeGreaterThan(0);
+      expect(screen.getAllByText("Sistema").length).toBeGreaterThan(0);
     });
   });
 });

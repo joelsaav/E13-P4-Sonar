@@ -1,7 +1,20 @@
-import { SharePermission } from "../permissions";
+import type { SharePermission } from "../permissions";
 
 export type TaskStatus = "PENDING" | "IN_PROGRESS" | "COMPLETED";
+
+export const TaskStatusColors: Record<TaskStatus, string> = {
+  PENDING: "#FFA500",
+  IN_PROGRESS: "#007BFF",
+  COMPLETED: "#28A745",
+};
 export type TaskPriority = "LOW" | "MEDIUM" | "HIGH" | "URGENT";
+
+export const TaskPriorityColors: Record<TaskPriority, string> = {
+  LOW: "#6B7280",
+  MEDIUM: "#3B82F6",
+  HIGH: "#F59E0B",
+  URGENT: "#DC2626",
+};
 
 export interface Task {
   id: string;
@@ -39,6 +52,7 @@ export interface TasksState {
     listId: string | null;
     search: string;
     priority: "all" | TaskPriority;
+    favorite: "all" | "yes" | "no";
   };
   sorting: {
     field: "name" | "dueDate" | "priority" | "createdAt" | "updatedAt";

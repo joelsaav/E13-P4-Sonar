@@ -8,15 +8,15 @@ import {
   shareList,
   unshareList,
   updateSharePermission,
-} from "../controllers/listsController";
-import { authenticate } from "../middleware/authMiddleware";
+} from "../controllers/listsController.js";
+import { authenticate } from "../middleware/authMiddleware.js";
 import {
   createListSchema,
   updateListSchema,
   shareListSchema,
   updateShareSchema,
-} from "../schemas/validationSchemas";
-import { validateBody } from "../middleware/validationMiddleware";
+} from "../schemas/validationSchemas.js";
+import { validateBody } from "../middleware/validationMiddleware.js";
 
 const router = Router();
 

@@ -8,11 +8,15 @@ vi.mock("@/hooks/useAuth", () => ({
   useAuth: vi.fn(),
 }));
 
-vi.mock("@/components/appMenubar", () => ({
+vi.mock("@/hooks/useSocket", () => ({
+  useSocket: vi.fn(),
+}));
+
+vi.mock("@/components/layout/AppMenubar", () => ({
   default: () => <div data-testid="app-menubar">AppMenubar</div>,
 }));
 
-vi.mock("@/components/footer", () => ({
+vi.mock("@/components/layout/Footer", () => ({
   default: () => <div data-testid="footer">Footer</div>,
 }));
 
@@ -40,7 +44,7 @@ vi.mock("@/pages/authenticated/tasksPage", () => ({
   default: () => <div data-testid="tasks-page">Tasks Page</div>,
 }));
 
-vi.mock("@/pages/authenticated/SharedPage", () => ({
+vi.mock("@/pages/authenticated/sharedPage", () => ({
   default: () => <div data-testid="shared-page">Shared Page</div>,
 }));
 
@@ -48,7 +52,7 @@ vi.mock("@/pages/authenticated/settingsPage", () => ({
   default: () => <div data-testid="settings-page">Settings Page</div>,
 }));
 
-vi.mock("@/components/auth/protectedRoute", () => ({
+vi.mock("@/components/auth/ProtectedRoute", () => ({
   default: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="protected-route">{children}</div>
   ),

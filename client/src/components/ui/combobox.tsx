@@ -25,7 +25,7 @@ interface ComboboxProps {
   items: Item[];
   value: string;
   onValueChange: (value: string) => void;
-  onCreateNew: () => void;
+  onCreateNew?: () => void;
   placeholder?: string;
   searchPlaceholder?: string;
   emptyMessage?: string;
@@ -88,18 +88,20 @@ export function Combobox({
                 </CommandItem>
               ))}
             </CommandGroup>
-            <CommandGroup>
-              <CommandItem
-                onSelect={() => {
-                  setOpen(false);
-                  onCreateNew();
-                }}
-                className="text-primary"
-              >
-                <Icon as="IconPlus" size={16} className="mr-2" />
-                {createNewLabel}
-              </CommandItem>
-            </CommandGroup>
+            {onCreateNew && (
+              <CommandGroup>
+                <CommandItem
+                  onSelect={() => {
+                    setOpen(false);
+                    onCreateNew();
+                  }}
+                  className="text-primary"
+                >
+                  <Icon as="IconPlus" size={16} className="mr-2" />
+                  {createNewLabel}
+                </CommandItem>
+              </CommandGroup>
+            )}
           </CommandList>
         </Command>
       </PopoverContent>

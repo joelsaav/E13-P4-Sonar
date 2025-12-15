@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
 export type SidebarWidth = "compact" | "normal" | "wide";
 export type TaskCardSize = 2 | 3 | 4;

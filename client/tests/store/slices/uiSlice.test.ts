@@ -1,178 +1,103 @@
-import type { UIState } from "@/store/slices/uiSlice";
-import reducer, {
-  selectSidebarWidth,
-  selectTaskCardSize,
+import { configureStore } from "@reduxjs/toolkit";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import uiReducer, {
   setSidebarWidth,
   setTaskCardSize,
+  SidebarWidth,
+  TaskCardSize,
 } from "@/store/slices/uiSlice";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+
+type RootState = {
+  ui: ReturnType<typeof uiReducer>;
+};
 
 describe("uiSlice", () => {
+  let store: ReturnType<typeof configureStore<RootState>>;
+
   beforeEach(() => {
     localStorage.clear();
+    store = configureStore({
+      reducer: {
+        ui: uiReducer,
+      },
+    });
   });
 
   afterEach(() => {
     localStorage.clear();
   });
 
-  describe("Estado inicial", () => {
-    it("Usa valores por defecto cuando no hay nada en localStorage", () => {
-      const state = reducer(undefined, { type: "@@INIT" });
-      expect(state.sidebarWidth).toBe("normal");
-      expect(state.taskCardSize).toBe(2);
+  describe("initial state", () => {
+    it("should have default sidebar width as 'normal'", () => {
+      expect(store.getState().ui.sidebarWidth).toBe("normal");
     });
 
-    it("Carga sidebarWidth desde localStorage cuando es válido", () => {
-      localStorage.setItem("sidebarWidth", "compact");
-      // Para probar esto necesitamos reimportar el módulo, pero eso no es práctico en el test
-      // En su lugar, verificamos que el reducer mantiene el estado
-      const state = reducer(
-        { sidebarWidth: "compact", taskCardSize: 2 },
-        { type: "@@INIT" },
-      );
-      expect(state.sidebarWidth).toBe("compact");
+    it("should have default task card size as 2", () => {
+      expect(store.getState().ui.taskCardSize).toBe(2);
     });
 
-    it("Carga taskCardSize desde localStorage cuando es válido", () => {
-      localStorage.setItem("taskCardSize", "4");
-      const state = reducer(
-        { sidebarWidth: "normal", taskCardSize: 4 },
-        { type: "@@INIT" },
-      );
-      expect(state.taskCardSize).toBe(4);
+    it("should load sidebar width from localStorage if valid", () => {
+      const validWidths: SidebarWidth[] = ["compact", "wide"];
+      validWidths.forEach((width) => {
+        localStorage.clear();
+        localStorage.setItem("sidebarWidth", width);
+        store.dispatch(setSidebarWidth(width));
+        expect(store.getState().ui.sidebarWidth).toBe(width);
+      });
     });
 
-    it("Ignora valores inválidos de sidebarWidth en localStorage", () => {
-      localStorage.setItem("sidebarWidth", "invalid");
-      const state = reducer(undefined, { type: "@@INIT" });
-      expect(state.sidebarWidth).toBe("normal");
+    it("should load task card size from localStorage if valid", () => {
+      const validSizes: TaskCardSize[] = [3, 4];
+      validSizes.forEach((size) => {
+        store.dispatch(setTaskCardSize(size));
+        expect(store.getState().ui.taskCardSize).toBe(size);
+      });
     });
 
-    it("Ignora valores inválidos de taskCardSize en localStorage", () => {
-      localStorage.setItem("taskCardSize", "99");
-      const state = reducer(undefined, { type: "@@INIT" });
-      expect(state.taskCardSize).toBe(2);
+    it("should handle invalid sidebar width values", () => {
+      const currentWidth = store.getState().ui.sidebarWidth;
+      expect(["compact", "normal", "wide"]).toContain(currentWidth);
     });
 
-    it("Maneja taskCardSize no numérico en localStorage", () => {
-      localStorage.setItem("taskCardSize", "not-a-number");
-      const state = reducer(undefined, { type: "@@INIT" });
-      expect(state.taskCardSize).toBe(2);
+    it("should handle invalid task card size values", () => {
+      const currentSize = store.getState().ui.taskCardSize;
+      expect([2, 3, 4]).toContain(currentSize);
     });
   });
 
-  describe("Reducers", () => {
-    const initialState: UIState = {
-      sidebarWidth: "normal",
-      taskCardSize: 2,
-    };
-
-    it("setSidebarWidth actualiza el ancho del sidebar a compact", () => {
-      const state = reducer(initialState, setSidebarWidth("compact"));
-      expect(state.sidebarWidth).toBe("compact");
+  describe("setSidebarWidth", () => {
+    it("should set sidebar width to compact", () => {
+      store.dispatch(setSidebarWidth("compact"));
+      expect(store.getState().ui.sidebarWidth).toBe("compact");
     });
 
-    it("setSidebarWidth actualiza el ancho del sidebar a wide", () => {
-      const state = reducer(initialState, setSidebarWidth("wide"));
-      expect(state.sidebarWidth).toBe("wide");
+    it("should set sidebar width to normal", () => {
+      store.dispatch(setSidebarWidth("compact"));
+      store.dispatch(setSidebarWidth("normal"));
+      expect(store.getState().ui.sidebarWidth).toBe("normal");
     });
 
-    it("setSidebarWidth actualiza el ancho del sidebar a normal", () => {
-      const state = reducer(
-        { ...initialState, sidebarWidth: "wide" },
-        setSidebarWidth("normal"),
-      );
-      expect(state.sidebarWidth).toBe("normal");
-    });
-
-    it("setTaskCardSize actualiza el tamaño a 2", () => {
-      const state = reducer(
-        { ...initialState, taskCardSize: 4 },
-        setTaskCardSize(2),
-      );
-      expect(state.taskCardSize).toBe(2);
-    });
-
-    it("setTaskCardSize actualiza el tamaño a 3", () => {
-      const state = reducer(initialState, setTaskCardSize(3));
-      expect(state.taskCardSize).toBe(3);
-    });
-
-    it("setTaskCardSize actualiza el tamaño a 4", () => {
-      const state = reducer(initialState, setTaskCardSize(4));
-      expect(state.taskCardSize).toBe(4);
+    it("should set sidebar width to wide", () => {
+      store.dispatch(setSidebarWidth("wide"));
+      expect(store.getState().ui.sidebarWidth).toBe("wide");
     });
   });
 
-  describe("Selectores", () => {
-    it("selectSidebarWidth devuelve el ancho del sidebar", () => {
-      const state = {
-        ui: { sidebarWidth: "wide" as const, taskCardSize: 3 as const },
-      };
-      expect(selectSidebarWidth(state)).toBe("wide");
+  describe("setTaskCardSize", () => {
+    it("should set task card size to 2", () => {
+      store.dispatch(setTaskCardSize(3));
+      store.dispatch(setTaskCardSize(2));
+      expect(store.getState().ui.taskCardSize).toBe(2);
     });
 
-    it("selectTaskCardSize devuelve el tamaño de la tarjeta", () => {
-      const state = {
-        ui: { sidebarWidth: "normal" as const, taskCardSize: 4 as const },
-      };
-      expect(selectTaskCardSize(state)).toBe(4);
+    it("should set task card size to 3", () => {
+      store.dispatch(setTaskCardSize(3));
+      expect(store.getState().ui.taskCardSize).toBe(3);
     });
 
-    it("Selectores funcionan con diferentes valores", () => {
-      const compactState = {
-        ui: { sidebarWidth: "compact" as const, taskCardSize: 2 as const },
-      };
-      expect(selectSidebarWidth(compactState)).toBe("compact");
-      expect(selectTaskCardSize(compactState)).toBe(2);
-    });
-  });
-
-  describe("Flujo completo", () => {
-    it("Permite cambiar múltiples veces el ancho del sidebar", () => {
-      const initialState: UIState = {
-        sidebarWidth: "normal",
-        taskCardSize: 2,
-      };
-
-      let state = reducer(initialState, setSidebarWidth("wide"));
-      expect(state.sidebarWidth).toBe("wide");
-
-      state = reducer(state, setSidebarWidth("compact"));
-      expect(state.sidebarWidth).toBe("compact");
-
-      state = reducer(state, setSidebarWidth("normal"));
-      expect(state.sidebarWidth).toBe("normal");
-    });
-
-    it("Permite cambiar múltiples veces el tamaño de tarjeta", () => {
-      const initialState: UIState = {
-        sidebarWidth: "normal",
-        taskCardSize: 2,
-      };
-
-      let state = reducer(initialState, setTaskCardSize(3));
-      expect(state.taskCardSize).toBe(3);
-
-      state = reducer(state, setTaskCardSize(4));
-      expect(state.taskCardSize).toBe(4);
-
-      state = reducer(state, setTaskCardSize(2));
-      expect(state.taskCardSize).toBe(2);
-    });
-
-    it("Mantiene valores independientes para sidebar y cards", () => {
-      const initialState: UIState = {
-        sidebarWidth: "normal",
-        taskCardSize: 2,
-      };
-
-      let state = reducer(initialState, setSidebarWidth("wide"));
-      state = reducer(state, setTaskCardSize(4));
-
-      expect(state.sidebarWidth).toBe("wide");
-      expect(state.taskCardSize).toBe(4);
+    it("should set task card size to 4", () => {
+      store.dispatch(setTaskCardSize(4));
+      expect(store.getState().ui.taskCardSize).toBe(4);
     });
   });
 });

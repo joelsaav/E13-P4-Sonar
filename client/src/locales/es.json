@@ -9,6 +9,18 @@
     "settings": "Configuración",
     "menu": "Menú"
   },
+  "chat": {
+    "title": "Asistente de Chat",
+    "suggestions": {
+      "createTask": "¿Cómo creo una nueva tarea?",
+      "shareList": "¿Cómo comparto una lista con mi equipo?",
+      "notifications": "¿Cómo configuro las notificaciones?"
+    },
+    "placeholder": "Pregunta sobre TaskGrid...",
+    "botResponse": "Soy un asistente de TaskGrid. Por favor configura el backend de IA para habilitar conversaciones reales.",
+    "promptsLabel": "Prueba estos prompts ✨",
+    "copiedMessage": "¡Respuesta copiada al portapapeles!"
+  },
   "auth": {
     "login": "Iniciar Sesión",
     "register": "Registrarse",
@@ -37,7 +49,9 @@
   "landing": {
     "welcome": "Bienvenido a",
     "subtitle": "Organiza tus tareas de manera eficiente y mejora tu productividad",
+    "scroll": "Desliza para ver más",
     "features": {
+      "title": "Características",
       "taskManagement": {
         "title": "Gestión de tareas inteligente",
         "description": "Crea, organiza y prioriza tareas con facilidad",
@@ -63,6 +77,17 @@
         "description": "Asignación, comentarios y seguimiento de actividad",
         "details": "Trabaja en equipo con asignaciones, menciones y un feed de actividad centralizado."
       }
+    },
+    "benefits": {
+      "free": "Gratuito",
+      "unlimited": "Ilimitado",
+      "real_time": "En tiempo real",
+      "collaboration": "Colaborativo"
+    },
+    "cta": {
+      "title": "Empieza a usar TaskGrid",
+      "subtitle": "Organiza tus tareas y colabora con tu equipo de la forma más eficiente posible. Además dispondrás de estadísticas y análisis para optimizar tu productividad.",
+      "register": "Regístrate"
     }
   },
   "contacts": {
@@ -165,7 +190,7 @@
     "card": {
       "createdLabel": "Creada:",
       "dueLabel": "Vence:",
-      "noDate": "Sin fecha"
+      "noDate": "No vence"
     },
     "filters": {
       "statusPlaceholder": "Estado",
@@ -181,7 +206,9 @@
       "sortOrder": {
         "asc": "Ascendente",
         "desc": "Descendente"
-      }
+      },
+      "showFavorites": "Mostrar favoritas",
+      "showAll": "Mostrar todas"
     },
     "priority": {
       "LOW": "Baja",
@@ -226,13 +253,18 @@
       "dueDate": {
         "label": "Fecha de vencimiento"
       }
+    },
+    "completion": {
+      "title": "¡Tarea Completada!",
+      "description": "Esta tarea será eliminada automáticamente en 7 días.",
+      "understood": "Entendido"
     }
   },
   "lists": {
     "title": "Listas",
     "emptyState": "No hay listas",
     "sidebar": {
-      "title": "Listas"
+      "title": "Mis Listas"
     },
     "create": {
       "title": "Nueva Lista",
@@ -318,10 +350,10 @@
       "days": "Hace {{count}} días"
     },
     "tabs": {
-      "GENERAL": "General",
-      "MENTION": "Menciones",
-      "INBOX": "Buzón",
-      "FILE": "Archivos"
+      "ALL": "Todos",
+      "SYSTEM": "Sistema",
+      "SHARED": "Compartidas",
+      "EXPIRED": "Vencidas"
     }
   },
   "dashboard": {
@@ -377,7 +409,8 @@
     "error": "Error",
     "success": "Éxito",
     "required": "Requerido",
-    "share": "Compartir"
+    "share": "Compartir",
+    "leave": "Salir"
   },
   "accessibility": {
     "close": "Cerrar"

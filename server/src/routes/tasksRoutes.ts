@@ -8,15 +8,15 @@ import {
   shareTask,
   unshareTask,
   updateSharePermission,
-} from "../controllers/tasksController";
-import { authenticate } from "../middleware/authMiddleware";
+} from "../controllers/tasksController.js";
+import { authenticate } from "../middleware/authMiddleware.js";
 import {
   createTaskSchema,
   updateTaskSchema,
   shareTaskSchema,
   updateShareSchema,
-} from "../schemas/validationSchemas";
-import { validateBody } from "../middleware/validationMiddleware";
+} from "../schemas/validationSchemas.js";
+import { validateBody } from "../middleware/validationMiddleware.js";
 
 const router = Router();
 

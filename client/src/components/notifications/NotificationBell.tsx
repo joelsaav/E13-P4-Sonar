@@ -7,18 +7,13 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Separator } from "@/components/ui/separator";
 import { useNotifications } from "@/hooks/useNotifications";
 import { useTranslation } from "react-i18next";
-import type { NotificationType } from "@/types/notification";
 import { Bell, Circle } from "lucide-react";
 import { useMemo, useState } from "react";
 
-type NotificationTab = "GENERAL" | "MENTION" | "INBOX" | "FILE";
+type NotificationTab = "ALL" | "SYSTEM" | "SHARED" | "EXPIRED";
 
-/**
- * Formatear fecha relativa (ej: "Hace 2 horas")
- */
 function useFormatRelativeTime() {
   const { t } = useTranslation();
 
@@ -44,35 +39,33 @@ function useFormatRelativeTime() {
 export function NotificationBell() {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<NotificationTab>("GENERAL");
-  const {
-    loading,
-    unreadCount,
-    markAsRead,
-    markAllAsRead,
-    getNotificationsByType,
-  } = useNotifications();
+  const [activeTab, setActiveTab] = useState<NotificationTab>("ALL");
+  const { notifications, loading, unreadCount, markAsRead, markAllAsRead } =
+    useNotifications();
 
   const formatRelativeTime = useFormatRelativeTime();
   const hasUnread = unreadCount > 0;
 
   const TAB_LABELS: Record<NotificationTab, string> = {
-    GENERAL: t("notifications.tabs.GENERAL"),
-    MENTION: t("notifications.tabs.MENTION"),
-    INBOX: t("notifications.tabs.INBOX"),
-    FILE: t("notifications.tabs.FILE"),
+    ALL: t("notifications.tabs.ALL"),
+    SYSTEM: t("notifications.tabs.SYSTEM"),
+    SHARED: t("notifications.tabs.SHARED"),
+    EXPIRED: t("notifications.tabs.EXPIRED"),
   };
 
-  const filteredNotifications = useMemo(
-    () => getNotificationsByType(activeTab as NotificationType),
-    [getNotificationsByType, activeTab],
-  );
+  const filteredNotifications = useMemo(() => {
+    if (activeTab === "ALL") {
+      return notifications;
+    }
+    return notifications.filter((n) => n.type === activeTab);
+  }, [notifications, activeTab]);
 
   const handleMarkAllRead = async () => {
     try {
       await markAllAsRead();
     } catch (error) {
-      console.error("Error al marcar todos como leído:", error);
+      if (import.meta.env.DEV)
+        console.error("Error al marcar todos como leído:", error);
     }
   };
 
@@ -80,7 +73,8 @@ export function NotificationBell() {
     try {
       await markAsRead(id);
     } catch (error) {
-      console.error("Error al marcar como leído:", error);
+      if (import.meta.env.DEV)
+        console.error("Error al marcar como leído:", error);
     }
   };
 
@@ -104,7 +98,6 @@ export function NotificationBell() {
 
       <PopoverContent className="w-[380px] p-0 shadow-lg" align="end">
         <Card className="border-0">
-          {/* Cabecera */}
           <div className="flex items-center justify-between border-b px-4 py-3">
             <div className="flex flex-col">
               <span className="text-sm font-semibold">
@@ -128,7 +121,6 @@ export function NotificationBell() {
             )}
           </div>
 
-          {/* Pestañas */}
           <div className="flex gap-1 border-b px-2 py-2 text-xs font-medium">
             {(Object.keys(TAB_LABELS) as NotificationTab[]).map((tab) => (
               <button
@@ -143,14 +135,13 @@ export function NotificationBell() {
                 ].join(" ")}
               >
                 <span>{TAB_LABELS[tab]}</span>
-                {tab === "GENERAL" && hasUnread && (
+                {tab === "ALL" && hasUnread && (
                   <Circle className="ml-1 h-2 w-2 fill-primary-foreground text-primary-foreground" />
                 )}
               </button>
             ))}
           </div>
 
-          {/* Lista de notificaciones */}
           <div className="max-h-80 space-y-1 overflow-y-auto px-2 py-2">
             {loading ? (
               <div className="px-3 py-6 text-center text-xs text-muted-foreground">
@@ -209,18 +200,6 @@ export function NotificationBell() {
                 </button>
               ))
             )}
-          </div>
-
-          <Separator className="mt-1" />
-
-          {/* Pie del popup */}
-          <div className="flex items-center justify-between px-4 py-2.5">
-            <span className="text-[11px] text-muted-foreground">
-              {t("notifications.activityCenter")}
-            </span>
-            <Button variant="ghost" size="sm" className="text-xs">
-              {t("notifications.viewAll")}
-            </Button>
           </div>
         </Card>
       </PopoverContent>

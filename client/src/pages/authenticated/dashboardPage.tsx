@@ -2,16 +2,16 @@ import { useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { dashboardCards } from "@/config/dashboardConfig";
 import { useTranslation } from "react-i18next";
-import FeatureCard from "@/components/ui/featureCard";
-import Icon from "@/components/ui/icon";
-import { useTasks } from "@/hooks/useTasks";
+import FeatureCard from "@/components/shared/FeatureCard";
+import { useTasks } from "@/hooks/tasks/useTasks";
 import { useLists } from "@/hooks/useLists";
 import { useDashboardCharts } from "@/hooks/useDashboardCharts";
 import {
   PriorityChart,
   WeeklyTasksChart,
-} from "@/components/dashboard/dashboardCharts";
+} from "@/components/dashboard/DashboardCharts";
 import { Badge } from "@/components/ui/badge";
+import { Typewriter } from "@/components/shared/Typewriter";
 
 export default function DashboardPage() {
   const { t } = useTranslation();
@@ -96,11 +96,10 @@ export default function DashboardPage() {
     <div className="container mx-auto py-8">
       <div className="flex justify-between items-start mb-8">
         <div>
-          <h1 className="text-4xl font-bold mb-2">
-            {t("dashboard.welcome")}
-            {user?.name || "Usuario"}!{" "}
-            <Icon as="IconUser" size={26} className="inline-block" />
-          </h1>
+          <Typewriter
+            text={`${t("dashboard.welcome")}${user?.name || "Usuario"}!`}
+            className="text-4xl font-bold mb-2 inline-flex items-center gap-2"
+          />
           <p className="text-muted-foreground">
             {t("dashboard.description")} - {weekStats.weekNumber}
           </p>

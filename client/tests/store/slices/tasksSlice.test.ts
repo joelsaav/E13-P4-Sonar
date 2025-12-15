@@ -1,29 +1,16 @@
 import reducer, {
-  clearFilters,
   createTask,
   deleteTask,
   fetchSharedTasks,
   fetchTasks,
-  resetTasksState,
   selectFilteredTasks,
-  selectSelectedTask,
-  selectSharedTasks,
-  selectTaskById,
   selectTaskFilters,
   selectTaskSorting,
   selectTasks,
-  selectTasksByListId,
-  selectTasksByPriority,
-  selectTasksByStatus,
-  setError,
   setListFilter,
-  setLoading,
   setPriorityFilter,
-  setSearchFilter,
-  setSelectedTask,
   setSorting,
   setStatusFilter,
-  setTaskStatus,
   shareTask,
   toggleSortOrder,
   unshareTask,
@@ -66,6 +53,7 @@ const initialState: TasksState = {
     listId: null,
     search: "",
     priority: "all",
+    favorite: "all",
   },
   sorting: { field: "createdAt", order: "desc" },
 };
@@ -75,15 +63,6 @@ afterEach(() => {
 });
 
 describe("tasksSlice reducer", () => {
-  it("setLoading y setError", () => {
-    let state = reducer(initialState, setLoading(true));
-    expect(state.isLoading).toBe(true);
-
-    state = reducer(state, setError("err"));
-    expect(state.error).toBe("err");
-    expect(state.isLoading).toBe(false);
-  });
-
   it("fetchTasks.fulfilled reemplaza listado y reinicia flags", () => {
     const action = {
       type: fetchTasks.fulfilled.type,
@@ -145,100 +124,31 @@ describe("tasksSlice reducer", () => {
     expect(state.selectedTaskId).toBeNull();
   });
 
-  it("setTaskStatus ajusta status y completed/completedAt", () => {
-    vi.useFakeTimers();
-    vi.setSystemTime(new Date("2024-03-02T00:00:00.000Z"));
-    let state = reducer(
-      { ...initialState, tasks: [baseTask] },
-      setTaskStatus({ id: "t1", status: "COMPLETED" }),
-    );
-    expect(state.tasks[0].completed).toBe(true);
-    expect(state.tasks[0].completedAt).toBe("2024-03-02T00:00:00.000Z");
-
-    state = reducer(state, setTaskStatus({ id: "t1", status: "IN_PROGRESS" }));
-    expect(state.tasks[0].completed).toBe(false);
-    expect(state.tasks[0].completedAt).toBeUndefined();
-    expect(state.tasks[0].status).toBe("IN_PROGRESS");
-  });
-
-  it("setTaskStatus no hace nada si no encuentra la tarea", () => {
-    const state = reducer(
-      { ...initialState, tasks: [baseTask] },
-      setTaskStatus({ id: "not-found", status: "COMPLETED" }),
-    );
-    expect(state.tasks[0].completed).toBe(false);
-  });
-
-  it("actualiza filtros y sorting, y los restablece con clearFilters/toggleSortOrder", () => {
+  it("actualiza filtros y sorting con toggleSortOrder", () => {
     let state = reducer(initialState, setStatusFilter("PENDING"));
     state = reducer(state, setListFilter("l1"));
-    state = reducer(state, setSearchFilter("comprar"));
     state = reducer(state, setPriorityFilter("HIGH"));
     state = reducer(state, setSorting({ field: "name", order: "asc" }));
     expect(selectTaskFilters({ tasks: state }).status).toBe("PENDING");
     expect(selectTaskFilters({ tasks: state }).listId).toBe("l1");
-    expect(selectTaskFilters({ tasks: state }).search).toBe("comprar");
     expect(selectTaskFilters({ tasks: state }).priority).toBe("HIGH");
     expect(selectTaskSorting({ tasks: state }).order).toBe("asc");
 
     state = reducer(state, toggleSortOrder());
     expect(selectTaskSorting({ tasks: state }).order).toBe("desc");
-
-    state = reducer(state, clearFilters());
-    expect(selectTaskFilters({ tasks: state })).toEqual(initialState.filters);
-  });
-
-  it("setSelectedTask guarda id", () => {
-    const state = reducer(initialState, setSelectedTask("t1"));
-    expect(state.selectedTaskId).toBe("t1");
-  });
-
-  it("resetTasksState vuelve al inicial", () => {
-    const dirty: TasksState = {
-      ...initialState,
-      tasks: [baseTask],
-      selectedTaskId: "t1",
-      isLoading: true,
-      error: "x",
-      filters: { ...initialState.filters, status: "PENDING" },
-    };
-    const state = reducer(dirty, resetTasksState());
-    expect(state).toEqual(initialState);
   });
 });
 
 describe("tasksSlice selectors", () => {
   const wrap = (tasks: TasksState) => ({ tasks });
 
-  it("selectTasks y selectSelectedTask", () => {
+  it("selectTasks devuelve las tareas", () => {
     const state = wrap({
       ...initialState,
       tasks: [baseTask],
       selectedTaskId: "t1",
     });
     expect(selectTasks(state)).toEqual([baseTask]);
-    expect(selectSelectedTask(state)).toEqual(baseTask);
-  });
-
-  it("selectTaskById retorna coincidencia", () => {
-    const state = wrap({
-      ...initialState,
-      tasks: [baseTask, { ...baseTask, id: "t2" }],
-    });
-    expect(selectTaskById("t2")(state)?.id).toBe("t2");
-  });
-
-  it("selectTasksByListId filtra por lista", () => {
-    const state = wrap({
-      ...initialState,
-      tasks: [
-        baseTask,
-        { ...baseTask, id: "t2", listId: "l2" },
-        { ...baseTask, id: "t3", listId: "l1" },
-      ],
-    });
-    expect(selectTasksByListId("l1")(state)).toHaveLength(2);
-    expect(selectTasksByListId("l2")(state)).toHaveLength(1);
   });
 
   it("selectFilteredTasks aplica filtros y ordenamiento", () => {
@@ -262,39 +172,13 @@ describe("tasksSlice selectors", () => {
         listId: "l1",
         search: "algo",
         priority: "HIGH",
+        favorite: "all",
       },
       sorting: { field: "name", order: "asc" },
     };
     const result = selectFilteredTasks({ tasks: state });
     expect(result).toHaveLength(1);
     expect(result[0].id).toBe("t3");
-  });
-
-  it("selectTasksByStatus y selectTasksByPriority cuentan correctamente", () => {
-    const state = wrap({
-      ...initialState,
-      tasks: [
-        baseTask,
-        { ...baseTask, id: "t2", status: "COMPLETED", completed: true },
-        { ...baseTask, id: "t3", status: "IN_PROGRESS", priority: "HIGH" },
-        { ...baseTask, id: "t4", priority: "URGENT" },
-      ],
-    });
-    const statusCounts = selectTasksByStatus(state);
-    expect(statusCounts).toEqual({
-      pending: 2,
-      inProgress: 1,
-      completed: 1,
-      total: 4,
-    });
-
-    const priorityCounts = selectTasksByPriority(state);
-    expect(priorityCounts).toEqual({
-      low: 0,
-      medium: 2,
-      high: 1,
-      urgent: 1,
-    });
   });
 });
 
@@ -953,35 +837,5 @@ describe("tasksSlice - Acciones asíncronas adicionales", () => {
     };
     const sorted = selectFilteredTasks(state);
     expect(sorted).toHaveLength(2);
-  });
-
-  it("selectSharedTasks filtra tareas compartidas con usuario específico", () => {
-    const taskShared = {
-      ...baseTask,
-      id: "t1",
-      shares: [
-        {
-          id: "s1",
-          taskId: "t1",
-          userId: "u2",
-          user: { id: "u2", email: "user2@test.com", name: "User 2" },
-          permission: "VIEW" as const,
-        },
-      ],
-    };
-    const taskNotShared = {
-      ...baseTask,
-      id: "t2",
-      shares: [],
-    };
-    const state = {
-      tasks: {
-        ...initialState,
-        tasks: [taskShared, taskNotShared],
-      },
-    };
-    const sharedTasks = selectSharedTasks("u2")(state);
-    expect(sharedTasks).toHaveLength(1);
-    expect(sharedTasks[0].id).toBe("t1");
   });
 });

@@ -17,7 +17,7 @@ model User {
   image           String?
   emailVerifiedAt DateTime?
   emailNotifications Boolean        @default(true)
-  pushNotifications  Boolean        @default(false)
+  pushNotifications  Boolean        @default(true)
 
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
@@ -139,8 +139,7 @@ model Notification {
 }
 
 enum NotificationType {
-  GENERAL
-  MENTION
-  INBOX
-  FILE
+  SYSTEM
+  SHARED
+  EXPIRED
 }

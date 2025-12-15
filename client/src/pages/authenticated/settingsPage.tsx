@@ -1,9 +1,3 @@
-/**
- * @file SettingsPage.tsx
- * @description Página de ajustes donde los usuarios pueden modificar su perfil,
- * preferencias, notificaciones y privacidad.
- */
-
 import {
   Save,
   User,
@@ -16,7 +10,7 @@ import {
   Languages,
 } from "lucide-react";
 import { useSettings } from "@/hooks/useSettings";
-import { useTheme } from "@/hooks/useTheme";
+import { useTheme } from "@/hooks/ui/useTheme";
 import { useTranslation } from "react-i18next";
 import {
   Card,
@@ -37,8 +31,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useUI } from "@/hooks/useUI";
-import { SidebarWidth } from "@/store/slices/uiSlice";
+import { useUI } from "@/hooks/ui/useUI";
+import type { SidebarWidth } from "@/store/slices/uiSlice";
+import { Typewriter } from "@/components/shared/Typewriter";
 
 export default function SettingsPage() {
   const { t, i18n } = useTranslation();
@@ -75,12 +70,10 @@ export default function SettingsPage() {
     ? t("settings.profile.googleUserPasswordInfo")
     : passwordMsg;
 
-  // Cambiar tema (oscuro/claro)
   function handleToggleTheme() {
     setTheme(isDark ? "light" : "dark");
   }
 
-  // Cambiar idioma
   function handleLanguageChange(lng: string) {
     i18n.changeLanguage(lng);
   }
@@ -88,17 +81,17 @@ export default function SettingsPage() {
   return (
     <div className="mx-auto w-full max-w-7xl p-6 space-y-8">
       <header className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">
-          {t("settings.title")}
-        </h1>
+        <Typewriter
+          text={t("settings.title")}
+          className="text-2xl font-semibold tracking-tight"
+          speed={30}
+        />
         <p className="text-sm text-muted-foreground">
           {t("settings.subtitle")}
         </p>
       </header>
 
-      {/* Grid de tarjetas de configuración */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
-        {/* Perfil - ocupa toda la fila en desktop */}
         <Card className="md:col-span-2">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -110,10 +103,14 @@ export default function SettingsPage() {
           </CardHeader>
 
           <CardContent className="space-y-6">
-            {/* Nombre y email */}
             <form onSubmit={saveProfile} className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="name">{t("settings.profile.name")}</Label>
+                <Label
+                  htmlFor="name"
+                  className="inline-flex items-center gap-2"
+                >
+                  <User className="h-4 w-4" /> {t("settings.profile.name")}
+                </Label>
                 <Input
                   id="name"
                   value={name}
@@ -158,7 +155,6 @@ export default function SettingsPage() {
 
             {!isGoogleUser && <Separator />}
 
-            {/* Contraseña */}
             {!isGoogleUser && (
               <form
                 onSubmit={savePassword}
@@ -213,7 +209,6 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
-        {/* PREFERENCIAS: tema e idioma */}
         <Card className="md:col-span-1">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -314,7 +309,6 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
-        {/* NOTIFICACIONES: persistentes */}
         <Card className="md:col-span-1">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -359,7 +353,6 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
-        {/* PRIVACIDAD: eliminar cuenta */}
         <Card className="md:col-span-2">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">

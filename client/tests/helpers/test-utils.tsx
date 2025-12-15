@@ -8,6 +8,8 @@ import authReducer from "@/store/slices/authSlice";
 import themeReducer from "@/store/slices/themeSlice";
 import listsReducer from "@/store/slices/listsSlice";
 import tasksReducer from "@/store/slices/tasksSlice";
+import notificationsReducer from "@/store/slices/notificationsSlice";
+import uiReducer from "@/store/slices/uiSlice";
 
 interface ExtendedRenderOptions extends Omit<RenderOptions, "queries"> {
   preloadedState?: PreloadedState<RootState>;
@@ -24,6 +26,8 @@ export function renderWithProviders(
         theme: themeReducer,
         lists: listsReducer,
         tasks: tasksReducer,
+        notifications: notificationsReducer,
+        ui: uiReducer,
       },
       preloadedState,
     }),

@@ -234,5 +234,3 @@ export const selectToken = (state: { auth: AuthState }) => state.auth.token;
 export const selectAuthLoading = (state: { auth: AuthState }) =>
   state.auth.isLoading;
 export const selectAuthError = (state: { auth: AuthState }) => state.auth.error;
-export const selectIsInitializing = (state: { auth: AuthState }) =>
-  state.auth.isInitializing;

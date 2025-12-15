@@ -1,10 +1,3 @@
-/**
- * @file dashboardConfig.ts
- * @description Configuración del panel de control de la aplicación de gestión de tareas.
- * Aquí se definen las tarjetas que se mostrarán en el dashboard, incluyendo
- * iconos, títulos, descripciones y detalles específicos para cada tarjeta.
- */
-
 export const dashboardCards = [
   {
     icon: "IconCalendar",

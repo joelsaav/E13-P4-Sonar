@@ -4,15 +4,15 @@ import {
   register,
   googleSignIn,
   changePassword,
-} from "../controllers/authController";
-import { validateBody } from "../middleware/validationMiddleware";
+} from "../controllers/authController.js";
+import { validateBody } from "../middleware/validationMiddleware.js";
 import {
   registerSchema,
   loginSchema,
   googleAuthSchema,
   changePasswordSchema,
-} from "../schemas/validationSchemas";
-import { authenticate } from "../middleware/authMiddleware";
+} from "../schemas/validationSchemas.js";
+import { authenticate } from "../middleware/authMiddleware.js";
 
 const router = Router();
 

@@ -1,4 +1,4 @@
-import { useTheme } from "@/hooks/useTheme";
+import { useTheme } from "@/hooks/ui/useTheme";
 import themeReducer from "@/store/slices/themeSlice";
 import { configureStore } from "@reduxjs/toolkit";
 import { act, renderHook } from "@testing-library/react";
@@ -43,7 +43,6 @@ describe("useTheme", () => {
     });
 
     expect(result.current.theme).toBe("dark");
-    // DOM and localStorage updates are handled by store subscription, not the hook
   });
 
   it("Remueve la clase dark cuando el tema se establece como light", () => {

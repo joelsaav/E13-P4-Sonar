@@ -1,16 +1,14 @@
 import { Router } from "express";
 import {
-  getProfile,
   deleteAccount,
   updateProfile,
-} from "../controllers/usersController";
-import { authenticate } from "../middleware/authMiddleware";
-import { validateBody } from "../middleware/validationMiddleware";
-import { updateProfileSchema } from "../schemas/validationSchemas";
+} from "../controllers/usersController.js";
+import { authenticate } from "../middleware/authMiddleware.js";
+import { validateBody } from "../middleware/validationMiddleware.js";
+import { updateProfileSchema } from "../schemas/validationSchemas.js";
 
 const router = Router();
 
-router.get("/me", authenticate, getProfile);
 router.delete("/me", authenticate, deleteAccount);
 router.patch(
   "/me",

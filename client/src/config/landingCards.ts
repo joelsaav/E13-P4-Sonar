@@ -1,9 +1,3 @@
-/**
- * @file landingCards.ts
- * @description Configuración de las tarjetas de la página de inicio.
- * Define las tarjetas que se mostrarán en la página de inicio.
- */
-
 export const landingCards = [
   {
     icon: "IconClipboard",

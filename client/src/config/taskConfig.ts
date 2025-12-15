@@ -1,9 +1,3 @@
-/**
- * @file taskConfig.ts
- * @description Configuración de tareas, prioridades y estados.
- * Define las opciones y etiquetas para la gestión de tareas.
- */
-
 export const priorityConfig = {
   LOW: {
     color:
@@ -30,7 +24,7 @@ export const priorityConfig = {
 export const statusConfig = {
   PENDING: {
     color:
-      "bg-gray-500/10 text-gray-600 dark:text-gray-400 [&_svg]:stroke-gray-600 dark:[&_svg]:stroke-gray-400",
+      "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 [&_svg]:stroke-yellow-600 dark:[&_svg]:stroke-yellow-400",
     label: "Pendiente",
   },
   IN_PROGRESS: {
@@ -42,16 +36,5 @@ export const statusConfig = {
     color:
       "bg-green-500/10 text-green-600 dark:text-green-400 [&_svg]:stroke-green-600 dark:[&_svg]:stroke-green-400",
     label: "Completada",
-  },
-} as const;
-
-export const taskFavoritesConfig = {
-  FAVORITE: {
-    color: "bg-yellow-500/10 text-yellow-700 dark:text-yellow-400",
-    label: "Favorita",
-  },
-  NOT_FAVORITE: {
-    color: "bg-gray-500/10 text-gray-700 dark:text-gray-400",
-    label: "No Favorita",
   },
 } as const;

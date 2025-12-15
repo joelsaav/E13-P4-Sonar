@@ -1,0 +1,70 @@
+name: Coveralls Unified Analysis
+
+on:
+  push:
+    branches: ["main", "develop"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  test-client:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cloning repo
+        uses: actions/checkout@v4
+      
+      - name: Use Node.js 23.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 23.x
+          
+      - name: Install & Test Client
+        working-directory: client
+        run: |
+          npm ci
+          npm run coverage
+          
+      - name: Upload Client Coverage
+        uses: coverallsapp/github-action@v2.3.6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: ./client/coverage/lcov.info
+          base-path: ./client
+          flag-name: client
+          parallel: true
+
+  test-server:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cloning repo
+        uses: actions/checkout@v4
+        
+      - name: Use Node.js 23.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 23.x
+          
+      - name: Install & Test Server
+        working-directory: server
+        run: |
+          npm ci
+          npm run coverage
+          
+      - name: Upload Server Coverage
+        uses: coverallsapp/github-action@v2.3.6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: ./server/coverage/lcov.info
+          base-path: ./server
+          flag-name: server
+          parallel: true
+
+  finish:
+    needs: [test-client, test-server]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Coveralls Finished
+        uses: coverallsapp/github-action@v2.3.6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          parallel-finished: true

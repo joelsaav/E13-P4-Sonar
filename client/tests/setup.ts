@@ -5,14 +5,12 @@ import { afterAll, afterEach, beforeAll, expect } from "vitest";
 
 expect.extend(matchers);
 
-// Suprimir warnings de consola innecesarios durante los tests
 const originalError = console.error;
 const originalWarn = console.warn;
 
 beforeAll(() => {
   console.error = (...args: unknown[]) => {
     const message = args[0]?.toString() || "";
-    // Suprimir errores de conexión al servidor y warnings de Recharts
     if (
       message.includes("ECONNREFUSED") ||
       message.includes("Error al cargar notificaciones") ||
@@ -28,7 +26,6 @@ beforeAll(() => {
 
   console.warn = (...args: unknown[]) => {
     const message = args[0]?.toString() || "";
-    // Suprimir warnings de Recharts
     if (message.includes("width") && message.includes("height")) {
       return;
     }

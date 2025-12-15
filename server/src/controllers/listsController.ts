@@ -1,15 +1,18 @@
 import { Request, Response } from "express";
-import prisma from "../database/prisma";
-import { createNotification } from "./notificationsController";
+import prisma from "../database/prisma.js";
+import { SharePermission } from "@prisma/client";
+import { createNotification } from "./notificationsController.js";
+import { getIO } from "../utils/socket.js";
 
 export const createList = async (req: Request, res: Response) => {
   try {
     const { name, description } = req.body;
-    const ownerId = req.user?.id;
 
+    const ownerId = req.user?.id;
     if (!ownerId) {
       return res.status(401).json({ error: "User not authenticated" });
     }
+
     const list = await prisma.list.create({
       data: {
         name,
@@ -17,10 +20,24 @@ export const createList = async (req: Request, res: Response) => {
         ownerId,
       },
       include: {
-        shares: true,
+        shares: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                image: true,
+              },
+            },
+          },
+        },
         tasks: true,
       },
     });
+
+    getIO().to(`user:${ownerId}`).emit("list:created", list);
+
     return res.status(200).json(list);
   } catch (error) {
     console.error(error);
@@ -31,11 +48,29 @@ export const createList = async (req: Request, res: Response) => {
 export const deleteList = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const list = await prisma.list.delete({
+
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ error: "User not authenticated" });
+    }
+
+    const list = await getListWithPermissions(id, userId);
+    if (!list) {
+      return res.status(404).json({ error: "List not found" });
+    }
+
+    if (!hasListPermission(list, userId, SharePermission.ADMIN)) {
+      return res.status(403).json({ error: "Unauthorized" });
+    }
+
+    await prisma.list.delete({
       where: {
         id,
       },
     });
+
+    getIO().to(`list:${id}`).emit("list:deleted", id);
+
     return res.status(200).json(list);
   } catch (error) {
     console.error(error);
@@ -46,15 +81,28 @@ export const deleteList = async (req: Request, res: Response) => {
 export const getUserLists = async (req: Request, res: Response) => {
   try {
     const userId = req.user?.id;
+
     const lists = await prisma.list.findMany({
       where: {
         ownerId: userId,
       },
       include: {
-        shares: true,
+        shares: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                image: true,
+              },
+            },
+          },
+        },
         tasks: true,
       },
     });
+
     return res.status(200).json(lists);
   } catch (error) {
     console.error(error);
@@ -65,6 +113,7 @@ export const getUserLists = async (req: Request, res: Response) => {
 export const getSharedLists = async (req: Request, res: Response) => {
   try {
     const userId = req.user?.id;
+
     const lists = await prisma.list.findMany({
       where: {
         shares: {
@@ -74,7 +123,18 @@ export const getSharedLists = async (req: Request, res: Response) => {
         },
       },
       include: {
-        shares: true,
+        shares: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                image: true,
+              },
+            },
+          },
+        },
         tasks: true,
         owner: {
           select: {
@@ -86,6 +146,7 @@ export const getSharedLists = async (req: Request, res: Response) => {
         },
       },
     });
+
     return res.status(200).json(lists);
   } catch (error) {
     console.error(error);
@@ -96,27 +157,58 @@ export const getSharedLists = async (req: Request, res: Response) => {
 export const updateList = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ error: "User not authenticated" });
+    }
+
+    const list = await getListWithPermissions(id, userId);
+    if (!list) {
+      return res.status(404).json({ error: "List not found" });
+    }
+
+    if (!hasListPermission(list, userId, SharePermission.EDIT)) {
+      return res.status(403).json({ error: "Unauthorized" });
+    }
+
     const { name, description } = req.body;
+
     const dataToUpdate: {
       name?: string;
       description?: string;
     } = {};
-    if (name) dataToUpdate.name = name;
-    if (description) dataToUpdate.description = description;
+    if (name !== undefined) dataToUpdate.name = name;
+    if (description !== undefined) dataToUpdate.description = description;
     if (Object.keys(dataToUpdate).length === 0) {
       return res.status(400).json({ error: "No fields to update" });
     }
-    const list = await prisma.list.update({
+
+    const listUpdated = await prisma.list.update({
       where: {
         id,
       },
       data: dataToUpdate,
       include: {
-        shares: true,
+        shares: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                image: true,
+              },
+            },
+          },
+        },
         tasks: true,
       },
     });
-    return res.status(200).json(list);
+
+    getIO().to(`list:${id}`).emit("list:updated", listUpdated);
+
+    return res.status(200).json(listUpdated);
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: "Error updating list" });
@@ -126,6 +218,21 @@ export const updateList = async (req: Request, res: Response) => {
 export const shareList = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ error: "User not authenticated" });
+    }
+
+    const list = await getListWithPermissions(id, userId);
+    if (!list) {
+      return res.status(404).json({ error: "List not found" });
+    }
+
+    if (!hasListPermission(list, userId, SharePermission.ADMIN)) {
+      return res.status(403).json({ error: "Unauthorized" });
+    }
+
     const { email, permission } = req.body;
 
     const user = await prisma.user.findUnique({
@@ -133,10 +240,13 @@ export const shareList = async (req: Request, res: Response) => {
         email,
       },
     });
-
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
+    if (user.id === userId) {
+      return res.status(400).json({ error: "Cannot share list with yourself" });
+    }
+
     const existingShare = await prisma.listShare.findUnique({
       where: {
         listId_userId: {
@@ -150,7 +260,8 @@ export const shareList = async (req: Request, res: Response) => {
         .status(400)
         .json({ error: "List already shared with this user" });
     }
-    const list = await prisma.list.update({
+
+    const listUpdated = await prisma.list.update({
       where: {
         id,
       },
@@ -178,18 +289,23 @@ export const shareList = async (req: Request, res: Response) => {
         tasks: true,
       },
     });
+
     const currentUser = await prisma.user.findUnique({
       where: { id: req.user?.id },
       select: { name: true },
     });
+
     await createNotification(
       user.id,
-      "GENERAL",
+      "SHARED",
       "Nueva lista compartida",
-      `${currentUser?.name || "Alguien"} te ha compartido la lista "${list.name}"`,
+      `${currentUser?.name || "Alguien"} te ha compartido la lista "${listUpdated.name}"`,
       currentUser?.name || "Usuario",
     );
-    return res.status(200).json(list);
+
+    getIO().to(`user:${user.id}`).emit("list:shared", listUpdated);
+
+    return res.status(200).json(listUpdated);
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: "Error sharing list" });
@@ -199,7 +315,24 @@ export const shareList = async (req: Request, res: Response) => {
 export const unshareList = async (req: Request, res: Response) => {
   try {
     const { id, userId } = req.params;
-    const list = await prisma.list.update({
+
+    const currentUserId = req.user?.id;
+    if (!currentUserId) {
+      return res.status(401).json({ error: "User not authenticated" });
+    }
+
+    const list = await getListWithPermissions(id, currentUserId);
+    if (!list) {
+      return res.status(404).json({ error: "List not found" });
+    }
+
+    if (currentUserId !== userId) {
+      if (!hasListPermission(list, currentUserId, SharePermission.ADMIN)) {
+        return res.status(403).json({ error: "Unauthorized" });
+      }
+    }
+
+    const listUpdated = await prisma.list.update({
       where: {
         id,
       },
@@ -229,7 +362,10 @@ export const unshareList = async (req: Request, res: Response) => {
         tasks: true,
       },
     });
-    return res.status(200).json(list);
+
+    getIO().to(`user:${userId}`).emit("list:unshared", id);
+
+    return res.status(200).json(listUpdated);
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: "Error unsharing list" });
@@ -239,9 +375,24 @@ export const unshareList = async (req: Request, res: Response) => {
 export const updateSharePermission = async (req: Request, res: Response) => {
   try {
     const { id, userId } = req.params;
+
+    const currentUserId = req.user?.id;
+    if (!currentUserId) {
+      return res.status(401).json({ error: "User not authenticated" });
+    }
+
+    const list = await getListWithPermissions(id, currentUserId);
+    if (!list) {
+      return res.status(404).json({ error: "List not found" });
+    }
+
+    if (!hasListPermission(list, currentUserId, SharePermission.ADMIN)) {
+      return res.status(403).json({ error: "Unauthorized" });
+    }
+
     const { permission } = req.body;
 
-    const list = await prisma.list.update({
+    const listUpdated = await prisma.list.update({
       where: {
         id,
       },
@@ -277,9 +428,43 @@ export const updateSharePermission = async (req: Request, res: Response) => {
       },
     });
 
-    return res.status(200).json(list);
+    return res.status(200).json(listUpdated);
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: "Error updating share permission" });
   }
+};
+
+const getListWithPermissions = async (listId: string, userId: string) => {
+  return prisma.list.findUnique({
+    where: { id: listId },
+    include: {
+      shares: {
+        where: { userId },
+      },
+    },
+  });
+};
+
+const hasListPermission = (
+  list: any,
+  userId: string,
+  requiredPermission: SharePermission,
+) => {
+  if (list.ownerId === userId) return true;
+
+  const share = list.shares[0];
+  if (!share) return false;
+
+  return checkLevel(share.permission) >= checkLevel(requiredPermission);
+};
+
+const checkLevel = (permission: SharePermission) => {
+  const levels = {
+    [SharePermission.VIEW]: 1,
+    [SharePermission.EDIT]: 2,
+    [SharePermission.ADMIN]: 3,
+  };
+
+  return levels[permission];
 };

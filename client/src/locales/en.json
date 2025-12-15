@@ -9,6 +9,18 @@
     "settings": "Settings",
     "menu": "Menu"
   },
+  "chat": {
+    "title": "Chat Assistant",
+    "suggestions": {
+      "createTask": "How do I create a new task?",
+      "shareList": "How do I share a list with my team?",
+      "notifications": "How do I configure notifications?"
+    },
+    "placeholder": "Ask about TaskGrid...",
+    "botResponse": "I'm a TaskGrid assistant. Please configure the AI backend to enable real conversations.",
+    "promptsLabel": "Try these prompts ✨",
+    "copiedMessage": "Copied response to clipboard!"
+  },
   "auth": {
     "login": "Login",
     "register": "Register",
@@ -37,7 +49,9 @@
   "landing": {
     "welcome": "Welcome to",
     "subtitle": "Organize your tasks efficiently and boost your productivity",
+    "scroll": "Scroll for more",
     "features": {
+      "title": "Features",
       "taskManagement": {
         "title": "Smart task management",
         "description": "Create, organize and prioritize tasks with ease",
@@ -63,6 +77,17 @@
         "description": "Assignment, comments and activity tracking",
         "details": "Work as a team with assignments, mentions and a centralized activity feed."
       }
+    },
+    "benefits": {
+      "free": "Free",
+      "unlimited": "Unlimited",
+      "real_time": "Real-time",
+      "collaboration": "Collaborative"
+    },
+    "cta": {
+      "title": "Start using TaskGrid",
+      "subtitle": "Organize your tasks and collaborate with your team in the most efficient way possible. You will also have statistics and analysis to optimize your productivity.",
+      "register": "Register"
     }
   },
   "contacts": {
@@ -165,7 +190,7 @@
     "card": {
       "createdLabel": "Created:",
       "dueLabel": "Due:",
-      "noDate": "No date"
+      "noDate": "No due date"
     },
     "filters": {
       "statusPlaceholder": "Status",
@@ -181,7 +206,9 @@
       "sortOrder": {
         "asc": "Ascending",
         "desc": "Descending"
-      }
+      },
+      "showFavorites": "Show favorites",
+      "showAll": "Show all"
     },
     "priority": {
       "LOW": "Low",
@@ -226,13 +253,18 @@
       "dueDate": {
         "label": "Due date"
       }
+    },
+    "completion": {
+      "title": "Task Completed!",
+      "description": "This task will be automatically deleted in 7 days.",
+      "understood": "Understood"
     }
   },
   "lists": {
     "title": "Lists",
     "emptyState": "No lists",
     "sidebar": {
-      "title": "Lists"
+      "title": "My Lists"
     },
     "create": {
       "title": "New List",
@@ -318,10 +350,10 @@
       "days": "{{count}} days ago"
     },
     "tabs": {
-      "GENERAL": "General",
-      "MENTION": "Mentions",
-      "INBOX": "Inbox",
-      "FILE": "Files"
+      "ALL": "All",
+      "SYSTEM": "System",
+      "SHARED": "Shared",
+      "EXPIRED": "Expired"
     }
   },
   "dashboard": {
@@ -377,6 +409,7 @@
     "error": "Error",
     "success": "Success",
     "required": "Required",
-    "share": "Share"
+    "share": "Share",
+    "leave": "Leave"
   }
 }

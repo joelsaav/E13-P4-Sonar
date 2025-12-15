@@ -6,7 +6,12 @@ import type {
   TasksState,
   TaskStatus,
 } from "@/types/tasks-system/task";
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import {
+  createAsyncThunk,
+  createSelector,
+  createSlice,
+  type PayloadAction,
+} from "@reduxjs/toolkit";
 import { deleteList } from "./listsSlice";
 
 const initialState: TasksState = {
@@ -19,6 +24,7 @@ const initialState: TasksState = {
     listId: null,
     search: "",
     priority: "all",
+    favorite: "all",
   },
   sorting: {
     field: "createdAt",
@@ -26,7 +32,18 @@ const initialState: TasksState = {
   },
 };
 
-// Async Thunks
+function mergeTaskPayload(existingTask: Task, payload: Task): Task {
+  return {
+    ...existingTask,
+    ...payload,
+    list:
+      payload.list && existingTask.list
+        ? { ...existingTask.list, ...payload.list }
+        : payload.list || existingTask.list,
+    shares: payload.shares || existingTask.shares,
+  };
+}
+
 export const fetchTasks = createAsyncThunk(
   "tasks/fetchTasks",
   async (_, { rejectWithValue }) => {
@@ -157,56 +174,17 @@ const tasksSlice = createSlice({
   name: "tasks",
   initialState,
   reducers: {
-    setLoading: (state, action: PayloadAction<boolean>) => {
-      state.isLoading = action.payload;
-    },
-    setError: (state, action: PayloadAction<string | null>) => {
-      state.error = action.payload;
-      state.isLoading = false;
-    },
-    setTasks: (state, action: PayloadAction<Task[]>) => {
-      state.tasks = action.payload;
-      state.isLoading = false;
-      state.error = null;
-    },
-    setTaskStatus: (
-      state,
-      action: PayloadAction<{ id: string; status: TaskStatus }>,
-    ) => {
-      const task = state.tasks.find((t) => t.id === action.payload.id);
-      if (task) {
-        task.status = action.payload.status;
-        if (action.payload.status === "COMPLETED") {
-          task.completed = true;
-          task.completedAt = new Date().toISOString();
-        } else {
-          task.completed = false;
-          task.completedAt = undefined;
-        }
-      }
-    },
-    setSelectedTask: (state, action: PayloadAction<string | null>) => {
-      state.selectedTaskId = action.payload;
-    },
     setStatusFilter: (state, action: PayloadAction<"all" | TaskStatus>) => {
       state.filters.status = action.payload;
     },
     setListFilter: (state, action: PayloadAction<string | null>) => {
       state.filters.listId = action.payload;
     },
-    setSearchFilter: (state, action: PayloadAction<string>) => {
-      state.filters.search = action.payload;
-    },
     setPriorityFilter: (state, action: PayloadAction<"all" | TaskPriority>) => {
       state.filters.priority = action.payload;
     },
-    clearFilters: (state) => {
-      state.filters = {
-        status: "all",
-        listId: null,
-        search: "",
-        priority: "all",
-      };
+    setFavoriteFilter: (state, action: PayloadAction<"all" | "yes" | "no">) => {
+      state.filters.favorite = action.payload;
     },
     setSorting: (
       state,
@@ -220,10 +198,25 @@ const tasksSlice = createSlice({
     toggleSortOrder: (state) => {
       state.sorting.order = state.sorting.order === "asc" ? "desc" : "asc";
     },
-    resetTasksState: () => initialState,
+    taskAdded: (state, action: PayloadAction<Task>) => {
+      if (!state.tasks.find((t) => t.id === action.payload.id)) {
+        state.tasks.unshift(action.payload);
+      }
+    },
+    taskUpdated: (state, action: PayloadAction<Task>) => {
+      const index = state.tasks.findIndex((t) => t.id === action.payload.id);
+      if (index !== -1) {
+        state.tasks[index] = action.payload;
+      }
+    },
+    taskDeleted: (state, action: PayloadAction<string>) => {
+      state.tasks = state.tasks.filter((t) => t.id !== action.payload);
+      if (state.selectedTaskId === action.payload) {
+        state.selectedTaskId = null;
+      }
+    },
   },
   extraReducers: (builder) => {
-    // Fetch Tasks
     builder
       .addCase(fetchTasks.pending, (state) => {
         state.isLoading = true;
@@ -252,14 +245,15 @@ const tasksSlice = createSlice({
         state.error = action.payload as string;
       });
 
-    // Create Task
     builder
       .addCase(createTask.pending, (state) => {
         state.error = null;
       })
       .addCase(createTask.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.tasks.unshift(action.payload);
+        if (!state.tasks.find((t) => t.id === action.payload.id)) {
+          state.tasks.unshift(action.payload);
+        }
         state.error = null;
       })
       .addCase(createTask.rejected, (state, action) => {
@@ -267,7 +261,6 @@ const tasksSlice = createSlice({
         state.error = action.payload as string;
       });
 
-    // Update Task
     builder
       .addCase(updateTask.pending, (state, action) => {
         state.error = null;
@@ -288,15 +281,10 @@ const tasksSlice = createSlice({
       .addCase(updateTask.fulfilled, (state, action) => {
         const index = state.tasks.findIndex((t) => t.id === action.payload.id);
         if (index !== -1) {
-          state.tasks[index] = {
-            ...state.tasks[index],
-            ...action.payload,
-            list:
-              action.payload.list && state.tasks[index].list
-                ? { ...state.tasks[index].list, ...action.payload.list }
-                : action.payload.list || state.tasks[index].list,
-            shares: action.payload.shares || state.tasks[index].shares,
-          };
+          state.tasks[index] = mergeTaskPayload(
+            state.tasks[index],
+            action.payload,
+          );
         }
         state.error = null;
       })
@@ -304,7 +292,6 @@ const tasksSlice = createSlice({
         state.error = action.payload as string;
       });
 
-    // Delete Task
     builder
       .addCase(deleteTask.pending, (state) => {
         state.error = null;
@@ -322,7 +309,6 @@ const tasksSlice = createSlice({
         state.error = action.payload as string;
       });
 
-    // Share Task
     builder
       .addCase(shareTask.pending, (state) => {
         state.error = null;
@@ -330,15 +316,10 @@ const tasksSlice = createSlice({
       .addCase(shareTask.fulfilled, (state, action) => {
         const index = state.tasks.findIndex((t) => t.id === action.payload.id);
         if (index !== -1) {
-          state.tasks[index] = {
-            ...state.tasks[index],
-            ...action.payload,
-            list:
-              action.payload.list && state.tasks[index].list
-                ? { ...state.tasks[index].list, ...action.payload.list }
-                : action.payload.list || state.tasks[index].list,
-            shares: action.payload.shares || state.tasks[index].shares,
-          };
+          state.tasks[index] = mergeTaskPayload(
+            state.tasks[index],
+            action.payload,
+          );
         }
         state.error = null;
       })
@@ -346,7 +327,6 @@ const tasksSlice = createSlice({
         state.error = action.payload as string;
       });
 
-    // Update Share Permission
     builder
       .addCase(updateTaskSharePermission.pending, (state, action) => {
         state.error = null;
@@ -363,15 +343,10 @@ const tasksSlice = createSlice({
       .addCase(updateTaskSharePermission.fulfilled, (state, action) => {
         const index = state.tasks.findIndex((t) => t.id === action.payload.id);
         if (index !== -1) {
-          state.tasks[index] = {
-            ...state.tasks[index],
-            ...action.payload,
-            list:
-              action.payload.list && state.tasks[index].list
-                ? { ...state.tasks[index].list, ...action.payload.list }
-                : action.payload.list || state.tasks[index].list,
-            shares: action.payload.shares || state.tasks[index].shares,
-          };
+          state.tasks[index] = mergeTaskPayload(
+            state.tasks[index],
+            action.payload,
+          );
         }
         state.error = null;
       })
@@ -379,7 +354,6 @@ const tasksSlice = createSlice({
         state.error = action.payload as string;
       });
 
-    // Unshare Task
     builder
       .addCase(unshareTask.pending, (state) => {
         state.error = null;
@@ -387,15 +361,10 @@ const tasksSlice = createSlice({
       .addCase(unshareTask.fulfilled, (state, action) => {
         const index = state.tasks.findIndex((t) => t.id === action.payload.id);
         if (index !== -1) {
-          state.tasks[index] = {
-            ...state.tasks[index],
-            ...action.payload,
-            list:
-              action.payload.list && state.tasks[index].list
-                ? { ...state.tasks[index].list, ...action.payload.list }
-                : action.payload.list || state.tasks[index].list,
-            shares: action.payload.shares || state.tasks[index].shares,
-          };
+          state.tasks[index] = mergeTaskPayload(
+            state.tasks[index],
+            action.payload,
+          );
         }
         state.error = null;
       })
@@ -411,18 +380,15 @@ const tasksSlice = createSlice({
 });
 
 export const {
-  setLoading,
-  setError,
-  setTaskStatus,
-  setSelectedTask,
   setStatusFilter,
   setListFilter,
-  setSearchFilter,
   setPriorityFilter,
-  clearFilters,
+  setFavoriteFilter,
   setSorting,
   toggleSortOrder,
-  resetTasksState,
+  taskAdded,
+  taskUpdated,
+  taskDeleted,
 } = tasksSlice.actions;
 
 export default tasksSlice.reducer;
@@ -432,111 +398,77 @@ export const selectTasksLoading = (state: { tasks: TasksState }) =>
   state.tasks.isLoading;
 export const selectTasksError = (state: { tasks: TasksState }) =>
   state.tasks.error;
-export const selectSelectedTaskId = (state: { tasks: TasksState }) =>
-  state.tasks.selectedTaskId;
 export const selectTaskFilters = (state: { tasks: TasksState }) =>
   state.tasks.filters;
 export const selectTaskSorting = (state: { tasks: TasksState }) =>
   state.tasks.sorting;
+export const selectFilteredTasks = createSelector(
+  [selectTasks, selectTaskFilters, selectTaskSorting],
+  (tasks, filters, sorting) => {
+    let filtered = [...tasks];
 
-export const selectSelectedTask = (state: { tasks: TasksState }) => {
-  const { tasks, selectedTaskId } = state.tasks;
-  return tasks.find((task) => task.id === selectedTaskId) || null;
-};
-
-export const selectTaskById =
-  (taskId: string) => (state: { tasks: TasksState }) =>
-    state.tasks.tasks.find((task) => task.id === taskId) || null;
-
-export const selectTasksByListId =
-  (listId: string) => (state: { tasks: TasksState }) =>
-    state.tasks.tasks.filter((task) => task.listId === listId);
-
-export const selectFilteredTasks = (state: { tasks: TasksState }) => {
-  const { tasks, filters, sorting } = state.tasks;
-  let filtered = [...tasks];
-
-  if (filters.status !== "all") {
-    filtered = filtered.filter((task) => task.status === filters.status);
-  }
-
-  if (filters.listId) {
-    filtered = filtered.filter((task) => task.listId === filters.listId);
-  }
-
-  if (filters.priority !== "all") {
-    filtered = filtered.filter((task) => task.priority === filters.priority);
-  }
-
-  if (filters.search) {
-    const searchLower = filters.search.toLowerCase();
-    filtered = filtered.filter(
-      (task) =>
-        task.name.toLowerCase().includes(searchLower) ||
-        task.description?.toLowerCase().includes(searchLower),
-    );
-  }
-
-  filtered.sort((a, b) => {
-    let aValue: string | number;
-    let bValue: string | number;
-
-    switch (sorting.field) {
-      case "name":
-        aValue = a.name.toLowerCase();
-        bValue = b.name.toLowerCase();
-        break;
-      case "dueDate":
-        aValue = a.dueDate || "";
-        bValue = b.dueDate || "";
-        break;
-      case "priority": {
-        const priorityOrder = { LOW: 1, MEDIUM: 2, HIGH: 3, URGENT: 4 };
-        aValue = priorityOrder[a.priority];
-        bValue = priorityOrder[b.priority];
-        break;
-      }
-      case "updatedAt":
-        aValue = a.updatedAt;
-        bValue = b.updatedAt;
-        break;
-      case "createdAt":
-      default:
-        aValue = a.createdAt;
-        bValue = b.createdAt;
-        break;
+    if (filters.status !== "all") {
+      filtered = filtered.filter((task) => task.status === filters.status);
     }
 
-    if (aValue < bValue) return sorting.order === "asc" ? -1 : 1;
-    if (aValue > bValue) return sorting.order === "asc" ? 1 : -1;
-    return 0;
-  });
+    if (filters.listId) {
+      filtered = filtered.filter((task) => task.listId === filters.listId);
+    }
 
-  return filtered;
-};
+    if (filters.priority !== "all") {
+      filtered = filtered.filter((task) => task.priority === filters.priority);
+    }
 
-export const selectTasksByStatus = (state: { tasks: TasksState }) => {
-  const { tasks } = state.tasks;
-  return {
-    pending: tasks.filter((t) => t.status === "PENDING").length,
-    inProgress: tasks.filter((t) => t.status === "IN_PROGRESS").length,
-    completed: tasks.filter((t) => t.status === "COMPLETED").length,
-    total: tasks.length,
-  };
-};
+    if (filters.search) {
+      const searchLower = filters.search.toLowerCase();
+      filtered = filtered.filter(
+        (task) =>
+          task.name.toLowerCase().includes(searchLower) ||
+          task.description?.toLowerCase().includes(searchLower),
+      );
+    }
 
-export const selectTasksByPriority = (state: { tasks: TasksState }) => {
-  const { tasks } = state.tasks;
-  return {
-    low: tasks.filter((t) => t.priority === "LOW").length,
-    medium: tasks.filter((t) => t.priority === "MEDIUM").length,
-    high: tasks.filter((t) => t.priority === "HIGH").length,
-    urgent: tasks.filter((t) => t.priority === "URGENT").length,
-  };
-};
+    if (filters.favorite !== "all") {
+      filtered = filtered.filter((task) =>
+        filters.favorite === "yes" ? task.favorite : !task.favorite,
+      );
+    }
 
-export const selectSharedTasks =
-  (userId: string) => (state: { tasks: TasksState }) =>
-    state.tasks.tasks.filter((task) =>
-      task.shares?.some((share) => share.userId === userId),
-    );
+    filtered.sort((a, b) => {
+      let aValue: string | number;
+      let bValue: string | number;
+
+      switch (sorting.field) {
+        case "name":
+          aValue = a.name.toLowerCase();
+          bValue = b.name.toLowerCase();
+          break;
+        case "dueDate":
+          aValue = a.dueDate || "";
+          bValue = b.dueDate || "";
+          break;
+        case "priority": {
+          const priorityOrder = { LOW: 1, MEDIUM: 2, HIGH: 3, URGENT: 4 };
+          aValue = priorityOrder[a.priority];
+          bValue = priorityOrder[b.priority];
+          break;
+        }
+        case "updatedAt":
+          aValue = a.updatedAt;
+          bValue = b.updatedAt;
+          break;
+        case "createdAt":
+        default:
+          aValue = a.createdAt;
+          bValue = b.createdAt;
+          break;
+      }
+
+      if (aValue < bValue) return sorting.order === "asc" ? -1 : 1;
+      if (aValue > bValue) return sorting.order === "asc" ? 1 : -1;
+      return 0;
+    });
+
+    return filtered;
+  },
+);

@@ -1,4 +1,4 @@
-export type NotificationType = "GENERAL" | "MENTION" | "INBOX" | "FILE";
+export type NotificationType = "SYSTEM" | "SHARED" | "EXPIRED";
 
 export interface Notification {
   id: string;

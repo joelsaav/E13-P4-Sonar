@@ -1,12 +1,4 @@
-import {
-  api,
-  apiErrorMessage,
-  fetchNotifications,
-  fetchUnreadCount,
-  markAllNotificationsAsRead,
-  markNotificationAsRead,
-  setAuthToken,
-} from "@/lib/api";
+import { api, apiErrorMessage, setAuthToken } from "@/lib/api";
 import { AxiosError } from "axios";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -129,58 +121,6 @@ describe("api", () => {
       vi.mocked(axios.isAxiosError).mockReturnValue(true);
 
       expect(apiErrorMessage(error)).toBe("Generic Axios error");
-    });
-  });
-
-  describe("Funciones de notificaciones", () => {
-    it("fetchNotifications llama a GET /notifications", async () => {
-      const mockNotifications = [
-        {
-          id: "n1",
-          message: "Test notification",
-          isRead: false,
-          createdAt: "2024-01-01",
-        },
-      ];
-      vi.spyOn(api, "get").mockResolvedValue({ data: mockNotifications });
-
-      const result = await fetchNotifications();
-
-      expect(api.get).toHaveBeenCalledWith("/notifications");
-      expect(result).toEqual(mockNotifications);
-    });
-
-    it("fetchUnreadCount llama a GET /notifications/unread-count", async () => {
-      const mockResponse = { count: 5 };
-      vi.spyOn(api, "get").mockResolvedValue({ data: mockResponse });
-
-      const result = await fetchUnreadCount();
-
-      expect(api.get).toHaveBeenCalledWith("/notifications/unread-count");
-      expect(result).toBe(5);
-    });
-
-    it("markNotificationAsRead llama a PATCH /notifications/:id/read", async () => {
-      const mockNotification = {
-        id: "n1",
-        message: "Test",
-        isRead: true,
-        createdAt: "2024-01-01",
-      };
-      vi.spyOn(api, "patch").mockResolvedValue({ data: mockNotification });
-
-      const result = await markNotificationAsRead("n1");
-
-      expect(api.patch).toHaveBeenCalledWith("/notifications/n1/read");
-      expect(result).toEqual(mockNotification);
-    });
-
-    it("markAllNotificationsAsRead llama a PATCH /notifications/read-all", async () => {
-      vi.spyOn(api, "patch").mockResolvedValue({ data: undefined });
-
-      await markAllNotificationsAsRead();
-
-      expect(api.patch).toHaveBeenCalledWith("/notifications/read-all");
     });
   });
 });

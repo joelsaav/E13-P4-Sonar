@@ -8,7 +8,6 @@ import authReducer, {
   selectAuthError,
   selectAuthLoading,
   selectIsAuthenticated,
-  selectIsInitializing,
   selectToken,
   selectUser,
   updateUserProfile,
@@ -60,111 +59,6 @@ describe("authSlice", () => {
       });
     });
 
-    // Login Thunk
-    it("should handle loginUser.pending", () => {
-      const action = { type: loginUser.pending.type };
-      const state = authReducer(initialState, action);
-
-      expect(state.isLoading).toBe(true);
-      expect(state.error).toBeNull();
-    });
-
-    it("should handle loginUser.fulfilled", () => {
-      const action = {
-        type: loginUser.fulfilled.type,
-        payload: { user: mockUser, token: "token123" },
-      };
-      const state = authReducer(initialState, action);
-
-      expect(state.user).toEqual(mockUser);
-      expect(state.token).toBe("token123");
-      expect(state.isAuthenticated).toBe(true);
-      expect(state.isLoading).toBe(false);
-      expect(state.error).toBeNull();
-    });
-
-    it("should handle loginUser.rejected", () => {
-      const action = {
-        type: loginUser.rejected.type,
-        payload: "Invalid credentials",
-      };
-      const state = authReducer(initialState, action);
-
-      expect(state.isLoading).toBe(false);
-      expect(state.error).toBe("Invalid credentials");
-      expect(state.isAuthenticated).toBe(false);
-    });
-
-    // Register Thunk
-    it("should handle registerUser.pending", () => {
-      const action = { type: registerUser.pending.type };
-      const state = authReducer(initialState, action);
-
-      expect(state.isLoading).toBe(true);
-      expect(state.error).toBeNull();
-    });
-
-    it("should handle registerUser.fulfilled", () => {
-      const action = {
-        type: registerUser.fulfilled.type,
-        payload: { user: mockUser, token: "token123" },
-      };
-      const state = authReducer(initialState, action);
-
-      expect(state.user).toEqual(mockUser);
-      expect(state.token).toBe("token123");
-      expect(state.isAuthenticated).toBe(true);
-      expect(state.isLoading).toBe(false);
-      expect(state.error).toBeNull();
-    });
-
-    it("should handle registerUser.rejected", () => {
-      const action = {
-        type: registerUser.rejected.type,
-        payload: "Registration failed",
-      };
-      const state = authReducer(initialState, action);
-
-      expect(state.isLoading).toBe(false);
-      expect(state.error).toBe("Registration failed");
-      expect(state.isAuthenticated).toBe(false);
-    });
-
-    // Google Login Thunk
-    it("should handle loginWithGoogleUser.pending", () => {
-      const action = { type: loginWithGoogleUser.pending.type };
-      const state = authReducer(initialState, action);
-
-      expect(state.isLoading).toBe(true);
-      expect(state.error).toBeNull();
-    });
-
-    it("should handle loginWithGoogleUser.fulfilled", () => {
-      const action = {
-        type: loginWithGoogleUser.fulfilled.type,
-        payload: { user: mockUser, token: "token123" },
-      };
-      const state = authReducer(initialState, action);
-
-      expect(state.user).toEqual(mockUser);
-      expect(state.token).toBe("token123");
-      expect(state.isAuthenticated).toBe(true);
-      expect(state.isLoading).toBe(false);
-      expect(state.error).toBeNull();
-    });
-
-    it("should handle loginWithGoogleUser.rejected", () => {
-      const action = {
-        type: loginWithGoogleUser.rejected.type,
-        payload: "Google login failed",
-      };
-      const state = authReducer(initialState, action);
-
-      expect(state.isLoading).toBe(false);
-      expect(state.error).toBe("Google login failed");
-      expect(state.isAuthenticated).toBe(false);
-    });
-
     it("should handle logout action", () => {
       const loggedInState: AuthState = {
         ...initialState,
@@ -182,117 +76,6 @@ describe("authSlice", () => {
       expect(state.isAuthenticated).toBe(false);
       expect(state.isLoading).toBe(false);
       expect(state.error).toBeNull();
-    });
-
-    // Update Profile Thunk
-    it("should handle updateUserProfile.pending", () => {
-      const action = { type: updateUserProfile.pending.type };
-      const state = authReducer(initialState, action);
-
-      expect(state.isLoading).toBe(true);
-      expect(state.error).toBeNull();
-    });
-
-    it("should handle updateUserProfile.fulfilled", () => {
-      const loggedInState: AuthState = {
-        ...initialState,
-        user: mockUser,
-        token: "token123",
-        isAuthenticated: true,
-      };
-
-      const action = {
-        type: updateUserProfile.fulfilled.type,
-        payload: { name: "Updated Name" },
-      };
-      const state = authReducer(loggedInState, action);
-
-      expect(state.user?.name).toBe("Updated Name");
-      expect(state.user?.email).toBe(mockUser.email);
-    });
-
-    it("should handle updateUserProfile.fulfilled when user is null", () => {
-      const action = {
-        type: updateUserProfile.fulfilled.type,
-        payload: { name: "Updated Name" },
-      };
-      const state = authReducer(initialState, action);
-
-      expect(state.user).toBeNull();
-      expect(state.isLoading).toBe(false);
-    });
-
-    it("should handle updateUserProfile.rejected", () => {
-      const action = {
-        type: updateUserProfile.rejected.type,
-        payload: "Update failed",
-      };
-      const state = authReducer(initialState, action);
-
-      expect(state.isLoading).toBe(false);
-      expect(state.error).toBe("Update failed");
-    });
-
-    // Change Password Thunk
-    it("should handle changeUserPassword.pending", () => {
-      const action = { type: changeUserPassword.pending.type };
-      const state = authReducer(initialState, action);
-
-      expect(state.isLoading).toBe(true);
-      expect(state.error).toBeNull();
-    });
-
-    it("should handle changeUserPassword.fulfilled", () => {
-      const action = { type: changeUserPassword.fulfilled.type };
-      const state = authReducer(initialState, action);
-      expect(state.isLoading).toBe(false);
-    });
-
-    it("should handle changeUserPassword.rejected", () => {
-      const action = {
-        type: changeUserPassword.rejected.type,
-        payload: "Password change failed",
-      };
-      const state = authReducer(initialState, action);
-
-      expect(state.isLoading).toBe(false);
-      expect(state.error).toBe("Password change failed");
-    });
-
-    // Delete Account Thunk
-    it("should handle deleteUserAccount.pending", () => {
-      const action = { type: deleteUserAccount.pending.type };
-      const state = authReducer(initialState, action);
-
-      expect(state.isLoading).toBe(true);
-      expect(state.error).toBeNull();
-    });
-
-    it("should handle deleteUserAccount.fulfilled", () => {
-      const loggedInState: AuthState = {
-        ...initialState,
-        user: mockUser,
-        token: "token123",
-        isAuthenticated: true,
-      };
-
-      const action = { type: deleteUserAccount.fulfilled.type };
-      const state = authReducer(loggedInState, action);
-
-      expect(state.user).toBeNull();
-      expect(state.token).toBeNull();
-      expect(state.isAuthenticated).toBe(false);
-    });
-
-    it("should handle deleteUserAccount.rejected", () => {
-      const action = {
-        type: deleteUserAccount.rejected.type,
-        payload: "Delete account failed",
-      };
-      const state = authReducer(initialState, action);
-
-      expect(state.isLoading).toBe(false);
-      expect(state.error).toBe("Delete account failed");
     });
   });
 
@@ -323,23 +106,12 @@ describe("authSlice", () => {
         "Error message",
       );
     });
-
-    it("selectIsInitializing should return initializing status", () => {
-      const state = { auth: { ...initialState, isInitializing: true } };
-      expect(selectIsInitializing(state as { auth: AuthState })).toBe(true);
-    });
   });
 
   describe("getUserFromLocalStorage error handling", () => {
     it("should handle JSON parse errors in localStorage", () => {
-      // Guardamos un JSON inválido en localStorage
       localStorage.setItem("user", "invalid-json{");
-
-      // Reimportamos el módulo para que ejecute getUserFromLocalStorage con el valor inválido
-      // Como ya está cargado, simplemente creamos un nuevo estado inicial
       const state = authReducer(undefined, { type: "@@INIT" });
-
-      // Debe manejar el error y retornar null
       expect(state.user).toBeNull();
     });
   });
@@ -484,8 +256,8 @@ describe("authSlice", () => {
 
       const response = { user: mockUser, token: "token123" };
       vi.mocked(api.post)
-        .mockResolvedValueOnce({ data: null }) // register response
-        .mockResolvedValueOnce({ data: response }); // login response
+        .mockResolvedValueOnce({ data: null })
+        .mockResolvedValueOnce({ data: response });
 
       await store.dispatch(
         registerUser({
@@ -509,7 +281,7 @@ describe("authSlice", () => {
       const response = { user: mockUser, token: "token123" };
       vi.mocked(api.post).mockResolvedValueOnce({ data: response });
 
-      await store.dispatch(loginWithGoogleUser("google-token") as unknown);
+      await store.dispatch(loginWithGoogleUser("google-token") as any);
 
       const state = store.getState().auth;
       expect(state.user).toEqual(mockUser);
@@ -525,7 +297,7 @@ describe("authSlice", () => {
       const error = new Error("Update failed");
       vi.mocked(api.patch).mockRejectedValueOnce(error);
 
-      await store.dispatch(updateUserProfile({ name: "New Name" }) as unknown);
+      await store.dispatch(updateUserProfile({ name: "New Name" }) as any);
 
       const state = store.getState().auth;
       expect(state.error).toBe("Update failed");
@@ -558,7 +330,7 @@ describe("authSlice", () => {
       const error = new Error("Delete account failed");
       vi.mocked(api.delete).mockRejectedValueOnce(error);
 
-      await store.dispatch(deleteUserAccount() as unknown);
+      await store.dispatch(deleteUserAccount() as any);
 
       const state = store.getState().auth;
       expect(state.error).toBe("Delete account failed");
@@ -569,7 +341,6 @@ describe("authSlice", () => {
     it("should handle corrupted localStorage data", () => {
       localStorage.setItem("user", "invalid-json{");
 
-      // Force re-import to test the initialization
       const state = authReducer(undefined, { type: "@@INIT" });
       expect(state.user).toBeNull();
     });

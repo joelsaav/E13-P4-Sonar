@@ -1,5 +1,5 @@
-import { Task } from "./task";
-import { SharePermission } from "../permissions";
+import type { Task } from "./task";
+import type { SharePermission } from "../permissions";
 
 export interface List {
   id: string;

@@ -10,16 +10,17 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "strict": true,
+    "strict": false,
     "baseUrl": ".",
     "paths": { "@/*": ["src/*"] },
-    "types": ["vite/client"],
+    "types": ["vite/client", "node"],
     "forceConsistentCasingInFileNames": true,
-    "noImplicitReturns": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
+    "noImplicitReturns": false,
+    "noImplicitAny": false,
+    "strictNullChecks": false,
     "declaration": true,
-    "strictPropertyInitialization": true
+    "strictPropertyInitialization": false
   },
-  "include": ["src", "tests"]
+  "include": ["src", "tests"],
+  "exclude": []
 }

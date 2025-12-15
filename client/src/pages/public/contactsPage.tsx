@@ -1,9 +1,3 @@
-/**
- * @file ContactsPage.tsx
- * @description Página de contactos que muestra información del equipo
- * con tarjetas individuales para cada miembro. Incluye nombre, email
- * y enlace al perfil ULL.
- */
 import {
   Card,
   CardContent,
@@ -14,15 +8,18 @@ import {
 import { Mail, ExternalLink } from "lucide-react";
 import { team } from "@/config/team";
 import { useTranslation } from "react-i18next";
+import { Typewriter } from "@/components/shared/Typewriter";
 
 export default function ContactsPage() {
   const { t } = useTranslation();
   return (
-    <div className="mx-auto w-full max-w-6xl px-4">
+    <div className="mx-auto w-full max-w-6xl px-4 py-8 flex flex-col items-center">
       <header className="mb-6 text-center">
-        <h1 className="text-3xl font-semibold tracking-tight">
-          {t("contacts.title")}
-        </h1>
+        <Typewriter
+          text={t("contacts.title")}
+          className="text-3xl font-semibold tracking-tight"
+          speed={35}
+        />
         <p className="mt-1 text-sm text-muted-foreground">
           {t("contacts.subtitle")}
         </p>
@@ -83,8 +80,6 @@ export default function ContactsPage() {
           </Card>
         ))}
       </section>
-
-      <div className="pb-16" />
     </div>
   );
 }

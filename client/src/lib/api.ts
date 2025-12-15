@@ -1,10 +1,3 @@
-/**
- * @file api.ts
- * @description Cliente HTTP configurado para comunicarse con el backend.
- * Incluye manejo de tokens de autenticación y normalización de errores.
- */
-
-import type { Notification, UnreadCountResponse } from "@/types/notification";
 import axios, { AxiosError } from "axios";
 
 export const api = axios.create({
@@ -50,41 +43,4 @@ export function apiErrorMessage(err: unknown): string {
   }
 
   return ax.message || statusText || "Error inesperado en la API.";
-}
-
-// ========== Notificaciones ==========
-
-/**
- * Obtener todas las notificaciones del usuario autenticado
- */
-export async function fetchNotifications(): Promise<Notification[]> {
-  const res = await api.get<Notification[]>("/notifications");
-  return res.data;
-}
-
-/**
- * Obtener el contador de notificaciones no leídas
- */
-export async function fetchUnreadCount(): Promise<number> {
-  const res = await api.get<UnreadCountResponse>("/notifications/unread-count");
-  return res.data.count;
-}
-
-/**
- * Marcar una notificación como leída
- */
-export async function markNotificationAsRead(
-  notificationId: string,
-): Promise<Notification> {
-  const res = await api.patch<Notification>(
-    `/notifications/${notificationId}/read`,
-  );
-  return res.data;
-}
-
-/**
- * Marcar todas las notificaciones como leídas
- */
-export async function markAllNotificationsAsRead(): Promise<void> {
-  await api.patch("/notifications/read-all");
 }

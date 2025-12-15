@@ -12,3 +12,6 @@ vitest.config.ts
 src/middleware
 prisma
 database
+html
+.vscode
+coverage

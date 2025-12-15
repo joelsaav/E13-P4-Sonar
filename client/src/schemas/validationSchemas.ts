@@ -4,7 +4,6 @@ export const TaskStatus = z.enum(["PENDING", "IN_PROGRESS", "COMPLETED"]);
 export const Priority = z.enum(["LOW", "MEDIUM", "HIGH", "URGENT"]);
 export const SharePermission = z.enum(["VIEW", "EDIT", "ADMIN"]);
 
-// Auth
 export const registerSchema = z.object({
   name: z.string().min(1, "El nombre es obligatorio"),
   email: z.email({ message: "Email inválido" }),
@@ -40,7 +39,6 @@ export const changePasswordSchema = z.object({
     .regex(/[0-9]/, "New password must contain a number"),
 });
 
-// User
 export const updateNameSchema = z.object({
   name: z.string().min(1, "El nombre es obligatorio"),
 });

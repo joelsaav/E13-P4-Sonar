@@ -1,7 +1,12 @@
 import { api, apiErrorMessage } from "@/lib/api";
 import type { SharePermission } from "@/types/permissions";
 import type { List, ListsState } from "@/types/tasks-system/list";
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import {
+  createAsyncThunk,
+  createSelector,
+  createSlice,
+  type PayloadAction,
+} from "@reduxjs/toolkit";
 
 const initialState: ListsState = {
   lists: [],
@@ -10,7 +15,6 @@ const initialState: ListsState = {
   error: null,
 };
 
-// Async Thunks
 export const fetchLists = createAsyncThunk(
   "lists/fetchLists",
   async (_, { rejectWithValue }) => {
@@ -141,21 +145,28 @@ const listsSlice = createSlice({
   name: "lists",
   initialState,
   reducers: {
-    setLoading: (state, action: PayloadAction<boolean>) => {
-      state.isLoading = action.payload;
-    },
-    setError: (state, action: PayloadAction<string | null>) => {
-      state.error = action.payload;
-      state.isLoading = false;
-    },
-
     setSelectedList: (state, action: PayloadAction<string | null>) => {
       state.selectedListId = action.payload;
     },
-    resetListsState: () => initialState,
+    listUpdated: (state, action: PayloadAction<List>) => {
+      const index = state.lists.findIndex((l) => l.id === action.payload.id);
+      if (index !== -1) {
+        state.lists[index] = action.payload;
+      }
+    },
+    listCreated: (state, action: PayloadAction<List>) => {
+      if (!state.lists.find((l) => l.id === action.payload.id)) {
+        state.lists.unshift(action.payload);
+      }
+    },
+    listDeleted: (state, action: PayloadAction<string>) => {
+      state.lists = state.lists.filter((l) => l.id !== action.payload);
+      if (state.selectedListId === action.payload) {
+        state.selectedListId = null;
+      }
+    },
   },
   extraReducers: (builder) => {
-    // Fetch Lists
     builder
       .addCase(fetchLists.pending, (state) => {
         state.isLoading = true;
@@ -184,15 +195,15 @@ const listsSlice = createSlice({
         state.error = action.payload as string;
       });
 
-    // Create List
     builder
       .addCase(createList.pending, (state) => {
-        state.isLoading = true;
         state.error = null;
       })
       .addCase(createList.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.lists.unshift(action.payload);
+        if (!state.lists.find((l) => l.id === action.payload.id)) {
+          state.lists.unshift(action.payload);
+        }
         state.error = null;
       })
       .addCase(createList.rejected, (state, action) => {
@@ -200,10 +211,8 @@ const listsSlice = createSlice({
         state.error = action.payload as string;
       });
 
-    // Update List
     builder
       .addCase(updateList.pending, (state) => {
-        state.isLoading = true;
         state.error = null;
       })
       .addCase(updateList.fulfilled, (state, action) => {
@@ -219,10 +228,8 @@ const listsSlice = createSlice({
         state.error = action.payload as string;
       });
 
-    // Delete List
     builder
       .addCase(deleteList.pending, (state) => {
-        state.isLoading = true;
         state.error = null;
       })
       .addCase(deleteList.fulfilled, (state, action) => {
@@ -238,7 +245,6 @@ const listsSlice = createSlice({
         state.error = action.payload as string;
       });
 
-    // Share List
     builder
       .addCase(shareList.pending, (state) => {
         state.error = null;
@@ -254,7 +260,6 @@ const listsSlice = createSlice({
         state.error = action.payload as string;
       });
 
-    // Update Share Permission
     builder
       .addCase(updateListSharePermission.pending, (state, action) => {
         state.error = null;
@@ -279,7 +284,6 @@ const listsSlice = createSlice({
         state.error = action.payload as string;
       });
 
-    // Unshare List
     builder
       .addCase(unshareList.pending, (state) => {
         state.error = null;
@@ -297,7 +301,7 @@ const listsSlice = createSlice({
   },
 });
 
-export const { setLoading, setError, setSelectedList, resetListsState } =
+export const { setSelectedList, listUpdated, listCreated, listDeleted } =
   listsSlice.actions;
 
 export default listsSlice.reducer;
@@ -313,14 +317,15 @@ export const selectSelectedList = (state: { lists: ListsState }) => {
   const { lists, selectedListId } = state.lists;
   return lists.find((list) => list.id === selectedListId) || null;
 };
-export const selectListById =
-  (listId: string) => (state: { lists: ListsState }) =>
-    state.lists.lists.find((list) => list.id === listId) || null;
-export const selectOwnedLists =
-  (userId: string) => (state: { lists: ListsState }) =>
-    state.lists.lists.filter((list) => list.ownerId === userId);
-export const selectSharedLists =
-  (userId: string) => (state: { lists: ListsState }) =>
-    state.lists.lists.filter((list) =>
+export const selectOwnedLists = createSelector(
+  [selectLists, (_state: { lists: ListsState }, userId: string) => userId],
+  (lists, userId) => lists.filter((list) => list.ownerId === userId),
+);
+
+export const selectSharedLists = createSelector(
+  [selectLists, (_state: { lists: ListsState }, userId: string) => userId],
+  (lists, userId) =>
+    lists.filter((list) =>
       list.shares?.some((share) => share.userId === userId),
-    );
+    ),
+);
